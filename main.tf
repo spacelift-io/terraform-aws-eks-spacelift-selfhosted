@@ -58,38 +58,6 @@ module "eks" {
   cluster_version = var.eks_cluster_version
 
   bootstrap_self_managed_addons = false
-  cluster_addons = {
-    coredns = {
-      before_compute = true
-    }
-
-    vpc-cni = {
-      before_compute = true
-      configuration_values = jsonencode({
-        env = {
-          # Enable pod network interfaces to add support for security groups per pod (https://docs.aws.amazon.com/eks/latest/best-practices/sgpp.html)
-          ENABLE_POD_ENI                    = "true"
-          AWS_VPC_K8S_CNI_EXTERNALSNAT      = "true"
-          POD_SECURITY_GROUP_ENFORCING_MODE = "standard"
-        }
-        # By default the enforcing mode is set to standard. If we need to set it to strict, we need to enable the following setting
-        # init = {
-        #   env = {
-        #     # This is to allow the kubelet to connect to Pods on branch network interfaces via TCP for liveness/readiness probes.
-        #     DISABLE_TCP_EARLY_DEMUX = "true"
-        #   }
-        # }
-      })
-    }
-
-    kube-proxy = {
-      before_compute = true
-    }
-
-    eks-pod-identity-agent = {
-      before_compute = true
-    }
-  }
 
   # TODO(adamc): document this
   cluster_endpoint_public_access = true
@@ -125,6 +93,42 @@ module "eks" {
   }
 }
 
+module "eks_blueprints_addons" {
+  source  = "aws-ia/eks-blueprints-addons/aws"
+  version = "~> 1.0"
+
+  cluster_name      = module.eks.cluster_name
+  cluster_endpoint  = module.eks.cluster_endpoint
+  cluster_version   = module.eks.cluster_version
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  eks_addons = {
+    coredns = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+      configuration_values = jsonencode({
+        env = {
+          # Enable pod network interfaces to add support for security groups per pod (https://docs.aws.amazon.com/eks/latest/best-practices/sgpp.html)
+          ENABLE_POD_ENI                    = "true"
+          AWS_VPC_K8S_CNI_EXTERNALSNAT      = "true"
+          POD_SECURITY_GROUP_ENFORCING_MODE = "standard"
+        }
+      })
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    eks-pod-identity-agent = {
+      most_recent = true
+    }
+  }
+
+  enable_aws_load_balancer_controller = true
+  observability_tag                   = null
+}
+
 module "iam" {
   source = "./modules/iam"
 
@@ -150,4 +154,14 @@ module "iam" {
   server_service_account_name          = var.server_service_account_name
   drain_service_account_name           = var.drain_service_account_name
   scheduler_service_account_name       = var.scheduler_service_account_name
+}
+
+module "lb" {
+  source = "./modules/lb"
+
+  unique_suffix            = module.spacelift.unique_suffix
+  vpc_id                   = module.spacelift.vpc_id
+  server_security_group_id = module.spacelift.server_security_group_id
+  server_port              = var.server_port
+  mqtt_port                = var.mqtt_port
 }

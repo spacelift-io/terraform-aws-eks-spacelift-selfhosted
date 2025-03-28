@@ -31,6 +31,7 @@ output "shell" {
       MQTT_BROKER_ENDPOINT : "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local"
       # TODO(adamc): if we let folk bring their own VPC, maybe we add these as vars?
       SERVER_SECURITY_GROUP_ID : module.spacelift.server_security_group_id
+      SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
       DRAIN_SECURITY_GROUP_ID : module.spacelift.drain_security_group_id
       SCHEDULER_SECURITY_GROUP_ID : module.spacelift.scheduler_security_group_id
 

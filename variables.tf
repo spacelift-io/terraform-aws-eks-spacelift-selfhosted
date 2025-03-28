@@ -109,6 +109,18 @@ variable "server_domain" {
   description = "The domain that Spacelift is being hosted on, for example spacelift.example.com."
 }
 
+variable "server_port" {
+  type        = number
+  description = "The port that server pods listen on for HTTP. Used to setup security group rules between the load balancer and server pods."
+  default     = 1983
+}
+
+variable "mqtt_port" {
+  type        = number
+  description = "The port that the server pods listen on for MQTT. Used to setup security group rules between the load balancer and server pods."
+  default     = 1984
+}
+
 variable "s3_retain_on_destroy" {
   type        = bool
   description = "Whether to retain the S3 buckets' contents when destroyed. If true, and the S3 bucket isn't empty, the deletion will fail."
