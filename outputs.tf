@@ -1,5 +1,3 @@
-# TODO(adamc): add all outputs
-# TODO(adamc): add shell output
 output "shell" {
   sensitive = true
   value = templatefile("${path.module}/env.tftpl", {
@@ -49,7 +47,6 @@ output "shell" {
       DATABASE_READ_ONLY_URL = module.spacelift.database_read_only_url
 
       # Encryption
-      # TODO(adamc): add the ability to choose between KMS and RSA.
       ENCRYPTION_TYPE                  = "kms"
       ENCRYPTION_KMS_ENCRYPTION_KEY_ID = module.spacelift.kms_encryption_key_arn
       ENCRYPTION_KMS_SIGNING_KEY_ID    = module.spacelift.kms_signing_key_arn

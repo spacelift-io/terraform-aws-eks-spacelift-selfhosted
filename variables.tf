@@ -49,7 +49,7 @@ variable "rds_serverlessv2_scaling_configuration" {
   default = {
     min_capacity = 0.5
     max_capacity = 5.0
-}
+  }
 }
 
 variable "rds_delete_protection_enabled" {
@@ -170,4 +170,14 @@ variable "scheduler_service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account to use for the scheduler."
   default     = "spacelift-scheduler"
+}
+
+variable "eks_managed_node_group_defaults" {
+  description = "Any default node group configuration. By default all nodes will be attached to the private subnets and will have the cluster primary security group attached."
+  default     = null
+}
+
+variable "eks_managed_node_groups" {
+  description = "The configuration for any EKS managed node groups."
+  default     = null
 }
