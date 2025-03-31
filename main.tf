@@ -83,7 +83,7 @@ module "eks" {
       instance_types = ["c7a.large"]
       min_size       = 0
       max_size       = 10
-      desired_size   = 0
+      desired_size   = 2
       capacity_type  = "ON_DEMAND"
     }
   }
