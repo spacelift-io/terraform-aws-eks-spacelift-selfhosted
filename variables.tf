@@ -21,6 +21,12 @@ variable "vpc_cidr_block" {
   default     = "10.0.0.0/18"
 }
 
+variable "create_database" {
+  type        = bool
+  description = "Whether to create the Aurora RDS database. Default is true."
+  default     = true
+}
+
 variable "rds_subnet_ids" {
   type        = list(string)
   description = "List of subnet IDs to use for the RDS instances. If create_vpc is false, this must be provided."
@@ -40,13 +46,10 @@ variable "rds_serverlessv2_scaling_configuration" {
     seconds_until_auto_pause : optional(number)
   })
   description = "The serverlessv2_scaling_configuration block to use for the RDS cluster"
-  default     = null
+  default = {
+    min_capacity = 0.5
+    max_capacity = 5.0
 }
-
-variable "create_database" {
-  type        = bool
-  description = "Whether to create the Aurora RDS database. Default is true."
-  default     = true
 }
 
 variable "rds_delete_protection_enabled" {
@@ -87,7 +90,7 @@ variable "rds_instance_configuration" {
   default = {
     "primary-instance" = {
       instance_identifier = "primary"
-      instance_class      = "db.r6g.large"
+      instance_class      = "db.serverless"
     }
   }
 }
