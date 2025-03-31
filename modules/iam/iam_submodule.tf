@@ -1,11 +1,8 @@
 module "iam_roles_and_policies" {
-  source = "file:///Users/adamc/github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted"
-  # source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.0.1"
+  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.1.0"
 
-  write_as_files                    = false
-  enable_ecs_role_assumption        = false
-  enable_kubernetes_role_assumption = true
-  kubernetes_config = {
+  write_as_files = false
+  kubernetes_role_assumption_config = {
     aws_account_id                 = var.aws_account_id
     oidc_provider                  = var.oidc_provider
     namespace                      = var.namespace

@@ -25,3 +25,8 @@ jobs:
       - name: OpenTofu Validate
         if: always()
         run: tofu validate
+
+      - name: Run tflint
+        uses: reviewdog/action-tflint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
