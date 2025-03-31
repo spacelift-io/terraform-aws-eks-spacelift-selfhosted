@@ -109,16 +109,16 @@ variable "server_domain" {
   description = "The domain that Spacelift is being hosted on, for example spacelift.example.com."
 }
 
+variable "mqtt_broker_domain" {
+  type        = string
+  description = "The domain name to use for the MQTT broker (if enabling external workers). Leave unset if you only want to run workers in the same Kubernetes cluster that Spacelift runs in."
+  default     = null
+}
+
 variable "server_port" {
   type        = number
   description = "The port that server pods listen on for HTTP. Used to setup security group rules between the load balancer and server pods."
   default     = 1983
-}
-
-variable "mqtt_port" {
-  type        = number
-  description = "The port that the server pods listen on for MQTT. Used to setup security group rules between the load balancer and server pods."
-  default     = 1984
 }
 
 variable "s3_retain_on_destroy" {

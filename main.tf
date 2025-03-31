@@ -163,5 +163,4 @@ module "lb" {
   vpc_id                   = module.spacelift.vpc_id
   server_security_group_id = module.spacelift.server_security_group_id
   server_port              = var.server_port
-  mqtt_port                = var.mqtt_port
 }

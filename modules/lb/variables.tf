@@ -13,11 +13,6 @@ variable "server_port" {
   description = "The port that the server listens on."
 }
 
-variable "mqtt_port" {
-  type        = number
-  description = "The port that the MQTT broker listens on."
-}
-
 variable "server_security_group_id" {
   type        = string
   description = "The security group ID of the server pod."

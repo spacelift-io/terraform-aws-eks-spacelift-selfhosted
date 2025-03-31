@@ -19,24 +19,13 @@ output "shell" {
       SCHEDULER_ROLE_ARN : module.iam.scheduler_role_arn
 
       # Network
-      # PUBLIC_IP_NAME : module.network.gke_public_v4_name,
-      # PUBLIC_IP_ADDRESS : module.network.gke_public_v4_address,
-      # PUBLIC_IPV6_NAME : module.network.gke_public_v6_name,
-      # PUBLIC_IPV6_ADDRESS : module.network.gke_public_v6_address,
-      # MQTT_IP_NAME : module.network.mqtt_v4_name,
-      # MQTT_IP_ADDRESS : module.network.mqtt_v4_address,
-      # MQTT_IPV6_NAME : module.network.mqtt_v6_name,
-      # MQTT_IPV6_ADDRESS : module.network.mqtt_v6_address,
-      # MQTT_BROKER_ENDPOINT : module.dns.mqtt_endpoint,
-      MQTT_BROKER_ENDPOINT : "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local"
-      # TODO(adamc): if we let folk bring their own VPC, maybe we add these as vars?
+      MQTT_BROKER_DOMAIN : coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
       SERVER_SECURITY_GROUP_ID : module.spacelift.server_security_group_id
       SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
       DRAIN_SECURITY_GROUP_ID : module.spacelift.drain_security_group_id
       SCHEDULER_SECURITY_GROUP_ID : module.spacelift.scheduler_security_group_id
 
       # Artifacts
-      # ARTIFACT_REGISTRY_DOMAIN : module.artifacts.repository_domain,
       PRIVATE_ECR_LOGIN_URL : split("/", module.spacelift.ecr_backend_repository_url)[0]
       BACKEND_IMAGE : module.spacelift.ecr_backend_repository_url
       LAUNCHER_IMAGE : module.spacelift.ecr_launcher_repository_url
