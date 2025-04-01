@@ -202,7 +202,7 @@ output "public_subnet_ids" {
 }
 
 output "availability_zones" {
-  value       = var.create_vpc ? keys(module.spacelift.private_subnet_ids) : null
+  value       = var.create_vpc ? module.spacelift.availability_zones : null
   description = "Availability zones of the private subnets. They will be null if create_vpc is false."
 }
 
