@@ -19,10 +19,10 @@ output "shell" {
 
       # Network
       MQTT_BROKER_DOMAIN : coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
-      SERVER_SECURITY_GROUP_ID : module.spacelift.server_security_group_id
+      SERVER_SECURITY_GROUP_ID : local.server_security_group_id
       SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
-      DRAIN_SECURITY_GROUP_ID : module.spacelift.drain_security_group_id
-      SCHEDULER_SECURITY_GROUP_ID : module.spacelift.scheduler_security_group_id
+      DRAIN_SECURITY_GROUP_ID : local.drain_security_group_id
+      SCHEDULER_SECURITY_GROUP_ID : local.scheduler_security_group_id
 
       # Artifacts
       PRIVATE_ECR_LOGIN_URL : split("/", module.spacelift.ecr_backend_repository_url)[0]
@@ -62,9 +62,9 @@ output "security_group_policies" {
   description = "Kubernetes security group policies for Spacelift. These K8s objects must be deployed to the cluster for the security groups to be used by the pods."
   value = templatefile("${path.module}/security-group-policies.tftpl", {
     securityGroupIds = [
-      module.spacelift.server_security_group_id,
-      module.spacelift.drain_security_group_id,
-      module.spacelift.scheduler_security_group_id
+      local.server_security_group_id,
+      local.drain_security_group_id,
+      local.scheduler_security_group_id
     ]
     namespace                     = var.k8s_namespace
     clusterPrimarySecurityGroupId = module.eks.cluster_primary_security_group_id
@@ -172,17 +172,17 @@ output "kms_signing_key_arn" {
 }
 
 output "server_security_group_id" {
-  value       = module.spacelift.server_security_group_id
+  value       = local.server_security_group_id
   description = "ID of the security group for the Spacelift HTTP server."
 }
 
 output "drain_security_group_id" {
-  value       = module.spacelift.drain_security_group_id
+  value       = local.drain_security_group_id
   description = "ID of the security group for the Spacelift async-processing service."
 }
 
 output "scheduler_security_group_id" {
-  value       = module.spacelift.scheduler_security_group_id
+  value       = local.scheduler_security_group_id
   description = "ID of the security group for the Spacelift scheduler service."
 }
 
@@ -192,12 +192,12 @@ output "database_security_group_id" {
 }
 
 output "private_subnet_ids" {
-  value       = var.create_vpc ? values(module.spacelift.private_subnet_ids) : null
+  value       = local.private_subnet_ids
   description = "IDs of the private subnets. They will be null if create_vpc is false."
 }
 
 output "public_subnet_ids" {
-  value       = var.create_vpc ? values(module.spacelift.public_subnet_ids) : null
+  value       = local.public_subnet_ids
   description = "IDs of the public subnets. They will be null if create_vpc is false."
 }
 
@@ -207,7 +207,7 @@ output "availability_zones" {
 }
 
 output "vpc_id" {
-  value       = var.create_vpc ? module.spacelift.vpc_id : null
+  value       = local.vpc_id
   description = "ID of the VPC. It will be null if create_vpc is false."
 }
 

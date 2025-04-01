@@ -1,6 +1,6 @@
 locals {
   eks_managed_node_group_defaults = coalesce(var.eks_managed_node_group_defaults, {
-    subnet_ids                            = module.spacelift.private_subnet_ids
+    subnet_ids                            = local.private_subnet_ids
     attach_cluster_primary_security_group = true
   })
 
@@ -32,8 +32,8 @@ module "eks" {
   # in order to install the cluster addons.
   enable_cluster_creator_admin_permissions = true
 
-  vpc_id     = module.spacelift.vpc_id
-  subnet_ids = concat(module.spacelift.public_subnet_ids, module.spacelift.private_subnet_ids)
+  vpc_id     = local.vpc_id
+  subnet_ids = concat(local.public_subnet_ids, local.private_subnet_ids)
 
   # Node group configuration
   eks_managed_node_group_defaults = local.eks_managed_node_group_defaults

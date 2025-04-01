@@ -21,16 +21,45 @@ variable "vpc_cidr_block" {
   default     = "10.0.0.0/18"
 }
 
+variable "vpc_id" {
+  type        = string
+  description = "The VPC ID to use if create_vpc is false."
+  default     = null
+}
+
+variable "private_subnet_ids" {
+  type        = list(string)
+  description = "List of private subnet IDs to use for the RDS instances and EKS cluster. If create_vpc is false, this must be provided."
+  default     = null
+}
+
+variable "public_subnet_ids" {
+  type        = list(string)
+  description = "List of public subnet IDs to use for the EKS cluster. If create_vpc is false, this must be provided."
+  default     = null
+}
+
+# TODO(adamc): check if we can just remove the server SG and allow the LB controller to configure the rules
+variable "server_security_group_id" {
+  type        = string
+  description = "The security group to use for the server. Used when configuring load balancer rules. If create_vpc is false, this must be provided."
+  default     = null
+}
+variable "drain_security_group_id" {
+  type        = string
+  description = "The security group to use for the drain. Used when configuring load balancer rules. If create_vpc is false, this must be provided."
+  default     = null
+}
+variable "scheduler_security_group_id" {
+  type        = string
+  description = "The security group to use for the scheduler. Used when configuring load balancer rules. If create_vpc is false, this must be provided."
+  default     = null
+}
+
 variable "create_database" {
   type        = bool
   description = "Whether to create the Aurora RDS database. Default is true."
   default     = true
-}
-
-variable "rds_subnet_ids" {
-  type        = list(string)
-  description = "List of subnet IDs to use for the RDS instances. If create_vpc is false, this must be provided."
-  default     = []
 }
 
 variable "rds_security_group_ids" {
@@ -170,6 +199,11 @@ variable "scheduler_service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account to use for the scheduler."
   default     = "spacelift-scheduler"
+}
+
+variable "eks_cluster_name" {
+  description = "A custom name to use for the EKS cluster. By default one will be generated for you."
+  default     = null
 }
 
 variable "eks_managed_node_group_defaults" {

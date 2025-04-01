@@ -100,107 +100,90 @@ The module creates:
 
 #### Default
 
-This deploys a new VPC, a new Cloud SQL instance and a GKE cluster
+This deploys a new VPC, an RDS Postres cluster, all the related infrastructure resources, as well as an EKS cluster:
 
 ```hcl
 module "spacelift" {
-  source  = "github.com/spacelift-io/terraform-google-spacelift-selfhosted?ref=v0.0.5"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
 
-  region         = var.aws_region
-  project        = var.project
-  website_domain = var.app_domain
-  database_tier  = "db-f1-micro"
-  labels         = {"app" = "spacelift"}
+  aws_region = var.aws_region
+
+  # The domain you want to host Spacelift on, for example spacelift.example.com.
+  server_domain      = var.server_domain
 }
 ```
 
-### Deploy a cluster in an existing network
+### External workers
 
 ```hcl
-resource "google_compute_network" "default" {
-  name = "test"
-  auto_create_subnetworks  = false
-  enable_ula_internal_ipv6 = true
+module "spacelift" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
+
+  aws_region    = var.aws_region
+  server_domain = var.server_domain
+
+  # The domain workers should use to connect to the Spacelift MQTT broker. For example mqtt.spacelift.example.com.
+  mqtt_broker_domain = var.mqtt_broker_domain
+}
+```
+
+### Deploy into an existing VPC
+
+```hcl
+locals {
+  # The name of the EKS cluster that will be created. This needs to be defined up
+  # front to allow the VPC subnets to be tagged correctly.
+  cluster_name = "spacelift-cluster"
 }
 
-resource "google_compute_subnetwork" "default" {
-  name    = "test"
-  network = google_compute_network.default.id
-  region        = var.aws_region
-  ip_cidr_range = "10.0.0.0/16"
-  stack_type       = "IPV4_IPV6"
-  ipv6_access_type = "EXTERNAL"
-  secondary_ip_range {
-    range_name = "services"
-    ip_cidr_range = "192.168.16.0/22"
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+
+  name = "spacelift-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["eu-north-1a", "eu-north-1b", "eu-north-1c"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+  enable_nat_gateway = true
+
+  # DNS hostnames and DNS support are required for EKS.
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  # We tag the subnets to let EKS know which subnets to use for running workloads and load balancing.
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = 1
   }
-  secondary_ip_range {
-    range_name = "pods"
-    ip_cidr_range = "192.168.0.0/20"
+
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
   }
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-google-spacelift-selfhosted?ref=v0.0.5"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
 
-  region         = var.aws_region
-  project        = var.project
-  website_domain = var.app_domain
-  database_tier  = "db-f1-micro"
+  aws_region         = var.aws_region
+  server_domain      = var.server_domain
 
-  enable_network = false
-  network = google_compute_network.default
-  subnetwork = google_compute_subnetwork.default
-}
-```
+  create_vpc         = false
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnets
+  public_subnet_ids  = module.vpc.public_subnets
 
-#### Do not create a VPC and GKE cluster
+  # When defining your own VPC, you need to provide the database, server, drain and scheduler
+  # security groups. Take a look at https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted/blob/main/modules/network/security_groups.tf
+  # for an example of how these should be defined.
+  rds_security_group_ids      = [aws_security_group.database_sg.id]
+  server_security_group_id    = aws_security_group.server_sg.id
+  drain_security_group_id     = aws_security_group.drain_sg.id
+  scheduler_security_group_id = aws_security_group.scheduler_sg.id
 
-```hcl
-resource "google_compute_network" "default" {
-  name = "test"
-  auto_create_subnetworks  = false
-  enable_ula_internal_ipv6 = true
-}
-
-resource "google_service_account" "gke-node-service-account" {
-  account_id = "test-elie"
-}
-
-module "spacelift" {
-  source = "github.com/spacelift-io/terraform-google-spacelift-selfhosted?ref=v0.0.5"
-
-  region         = var.aws_region
-  project        = var.project
-  website_domain = var.app_domain
-  database_tier  = "db-f1-micro"
-
-  enable_gke = false
-  enable_network = false
-  node_service_account = google_service_account.gke-node-service-account
-  network = google_compute_network.default
-}
-```
-
-#### Do not create DB, VPC and GKE cluster
-
-```hcl
-resource "google_service_account" "gke-node-service-account" {
-  account_id = "test-elie"
-}
-
-module "spacelift" {
-  source = "github.com/spacelift-io/terraform-google-spacelift-selfhosted?ref=v0.0.5"
-
-  region         = var.aws_region
-  project        = var.project
-  website_domain = var.app_domain
-  database_tier  = "db-f1-micro"
-
-  enable_database      = false
-  enable_gke           = false
-  enable_network       = false
-  node_service_account = google_service_account.gke-node-service-account
+  eks_cluster_name = local.cluster_name
 }
 ```
 
