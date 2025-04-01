@@ -6,7 +6,14 @@ resource "random_uuid" "suffix" {
 
 locals {
   unique_suffix = lower(substr(random_uuid.suffix.id, 0, 5))
-  cluster_name  = "spacelift-cluster-${module.spacelift.unique_suffix}"
+  cluster_name  = coalesce(var.eks_cluster_name, "spacelift-cluster-${module.spacelift.unique_suffix}")
+
+  vpc_id                      = var.create_vpc ? module.spacelift.vpc_id : var.vpc_id
+  private_subnet_ids          = var.create_vpc ? module.spacelift.private_subnet_ids : var.private_subnet_ids
+  public_subnet_ids           = var.create_vpc ? module.spacelift.public_subnet_ids : var.public_subnet_ids
+  server_security_group_id    = var.create_vpc ? module.spacelift.server_security_group_id : var.server_security_group_id
+  drain_security_group_id     = var.create_vpc ? module.spacelift.drain_security_group_id : var.drain_security_group_id
+  scheduler_security_group_id = var.create_vpc ? module.spacelift.scheduler_security_group_id : var.scheduler_security_group_id
 }
 
 module "spacelift" {
@@ -14,7 +21,6 @@ module "spacelift" {
 
   unique_suffix = local.unique_suffix
   region        = var.aws_region
-  kms_arn       = var.kms_arn
 
   create_vpc           = var.create_vpc
   vpc_cidr_block       = var.vpc_cidr_block
@@ -31,7 +37,7 @@ module "spacelift" {
   }
 
   create_database                        = var.create_database
-  rds_subnet_ids                         = var.rds_subnet_ids
+  rds_subnet_ids                         = var.private_subnet_ids
   rds_security_group_ids                 = var.rds_security_group_ids
   rds_serverlessv2_scaling_configuration = var.rds_serverlessv2_scaling_configuration
   rds_delete_protection_enabled          = var.rds_delete_protection_enabled
@@ -80,7 +86,7 @@ module "lb" {
   source = "./modules/lb"
 
   unique_suffix            = module.spacelift.unique_suffix
-  vpc_id                   = module.spacelift.vpc_id
-  server_security_group_id = module.spacelift.server_security_group_id
+  vpc_id                   = local.vpc_id
+  server_security_group_id = local.server_security_group_id
   server_port              = var.server_port
 }
