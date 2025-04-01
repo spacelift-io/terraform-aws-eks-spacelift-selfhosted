@@ -10,7 +10,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=adamc%2FCU-8698eh69x-adjustments-for-eks"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted"
 
   unique_suffix = local.unique_suffix
   region        = var.aws_region
