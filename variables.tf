@@ -30,13 +30,13 @@ variable "vpc_id" {
 variable "private_subnet_ids" {
   type        = list(string)
   description = "List of private subnet IDs to use for the RDS instances and EKS cluster. If create_vpc is false, this must be provided."
-  default     = null
+  default     = []
 }
 
 variable "public_subnet_ids" {
   type        = list(string)
   description = "List of public subnet IDs to use for the EKS cluster. If create_vpc is false, this must be provided."
-  default     = null
+  default     = []
 }
 
 # TODO(adamc): check if we can just remove the server SG and allow the LB controller to configure the rules
