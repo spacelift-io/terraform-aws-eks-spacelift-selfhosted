@@ -21,6 +21,7 @@ module "spacelift" {
 
   unique_suffix = local.unique_suffix
   region        = var.aws_region
+  kms_arn       = var.kms_arn
 
   create_vpc           = var.create_vpc
   vpc_cidr_block       = var.vpc_cidr_block

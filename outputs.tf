@@ -172,17 +172,17 @@ output "kms_signing_key_arn" {
 }
 
 output "server_security_group_id" {
-  value       = module.spacelift.server_security_group_id
+  value       = local.server_security_group_id
   description = "ID of the security group for the Spacelift HTTP server."
 }
 
 output "drain_security_group_id" {
-  value       = module.spacelift.drain_security_group_id
+  value       = local.drain_security_group_id
   description = "ID of the security group for the Spacelift async-processing service."
 }
 
 output "scheduler_security_group_id" {
-  value       = module.spacelift.scheduler_security_group_id
+  value       = local.scheduler_security_group_id
   description = "ID of the security group for the Spacelift scheduler service."
 }
 
@@ -192,12 +192,12 @@ output "database_security_group_id" {
 }
 
 output "private_subnet_ids" {
-  value       = var.create_vpc ? values(module.spacelift.private_subnet_ids) : null
+  value       = local.private_subnet_ids
   description = "IDs of the private subnets. They will be null if create_vpc is false."
 }
 
 output "public_subnet_ids" {
-  value       = var.create_vpc ? values(module.spacelift.public_subnet_ids) : null
+  value       = local.public_subnet_ids
   description = "IDs of the public subnets. They will be null if create_vpc is false."
 }
 
@@ -207,7 +207,7 @@ output "availability_zones" {
 }
 
 output "vpc_id" {
-  value       = var.create_vpc ? module.spacelift.vpc_id : null
+  value       = local.vpc_id
   description = "ID of the VPC. It will be null if create_vpc is false."
 }
 

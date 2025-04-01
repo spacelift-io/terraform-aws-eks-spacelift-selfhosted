@@ -3,6 +3,12 @@ variable "aws_region" {
   description = "AWS region to deploy resources."
 }
 
+variable "kms_arn" {
+  type        = string
+  description = "ARN of the KMS key to use for encryption: S3 buckets, RDS instances, and ECR repositories. If empty, a new KMS key will be created."
+  default     = null
+}
+
 variable "create_vpc" {
   type        = bool
   description = "Whether to create a VPC for the Spacelift resources. Default is true. Note: if this is false, and create_database is true, you must provide rds_subnet_ids and rds_security_group_ids."
