@@ -125,6 +125,4 @@ module "spacelift" {
 
 ## 🚀 Release
 
-We have a [GitHub workflow](./.github/workflows/release.yaml) to automatically create a tag and a release based on the version number in [`.spacelift/config.yml`](./.spacelift/config.yml) file.
-
-When you're ready to release a new version, just simply bump the version number in the config file and open a pull request. Once the pull request is merged, the workflow will create a new release.
+To release a new version of the module, just create a new release with an appropriate tag in GitHub releases.
