@@ -215,3 +215,35 @@ variable "eks_managed_node_groups" {
   description = "The configuration for any EKS managed node groups."
   default     = null
 }
+
+variable "license_token" {
+  type        = string
+  description = "The JWT token for using Spacelift. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
+  default     = ""
+  sensitive   = true
+}
+
+variable "spacelift_public_api" {
+  type        = string
+  description = "The public API to use when sending usage data. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
+  default     = ""
+}
+
+variable "spacelift_version" {
+  type        = string
+  description = "The version of Spacelift being installed. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
+  default     = ""
+}
+
+variable "admin_username" {
+  type        = string
+  description = "The username for the Spacelift admin account. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
+  default     = ""
+}
+
+variable "admin_password" {
+  type        = string
+  description = "The password for the Spacelift admin account. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
+  default     = ""
+  sensitive   = true
+}

@@ -1,59 +1,37 @@
 output "shell" {
   sensitive   = true
-  description = "Environment variables for installation tasks."
+  description = "Environment variables for installation tasks. This output is just included as a convenience for use as part of the EKS getting started guide."
   value = templatefile("${path.module}/env.tftpl", {
     env : {
-      AWS_ACCOUNT_ID : data.aws_caller_identity.current.account_id
-      AWS_REGION : var.aws_region
-      SERVER_DOMAIN : var.server_domain
-      WEBHOOKS_ENDPOINT : "https://${var.server_domain}/webhooks"
-      K8S_NAMESPACE : var.k8s_namespace
+      AWS_ACCOUNT_ID    = data.aws_caller_identity.current.account_id
+      AWS_REGION        = var.aws_region
+      SERVER_DOMAIN     = var.server_domain
+      WEBHOOKS_ENDPOINT = "https://${var.server_domain}/webhooks"
+      SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
 
       # IAM
-      SERVER_SERVICE_ACCOUNT_NAME : var.server_service_account_name
-      SERVER_ROLE_ARN : module.iam.server_role_arn
-      DRAIN_SERVICE_ACCOUNT_NAME : var.drain_service_account_name
-      DRAIN_ROLE_ARN : module.iam.drain_role_arn
-      SCHEDULER_SERVICE_ACCOUNT_NAME : var.scheduler_service_account_name
-      SCHEDULER_ROLE_ARN : module.iam.scheduler_role_arn
+      SERVER_SERVICE_ACCOUNT_NAME    = var.server_service_account_name
+      SERVER_ROLE_ARN                = module.iam.server_role_arn
+      DRAIN_SERVICE_ACCOUNT_NAME     = var.drain_service_account_name
+      DRAIN_ROLE_ARN                 = module.iam.drain_role_arn
+      SCHEDULER_SERVICE_ACCOUNT_NAME = var.scheduler_service_account_name
+      SCHEDULER_ROLE_ARN             = module.iam.scheduler_role_arn
 
       # Network
-      MQTT_BROKER_DOMAIN : coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
-      SERVER_SECURITY_GROUP_ID : local.server_security_group_id
+      SERVER_SECURITY_GROUP_ID               = local.server_security_group_id
       SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
-      DRAIN_SECURITY_GROUP_ID : local.drain_security_group_id
-      SCHEDULER_SECURITY_GROUP_ID : local.scheduler_security_group_id
+      DRAIN_SECURITY_GROUP_ID                = local.drain_security_group_id
+      SCHEDULER_SECURITY_GROUP_ID            = local.scheduler_security_group_id
 
       # Artifacts
-      PRIVATE_ECR_LOGIN_URL : split("/", module.spacelift.ecr_backend_repository_url)[0]
-      BACKEND_IMAGE : module.spacelift.ecr_backend_repository_url
-      LAUNCHER_IMAGE : module.spacelift.ecr_launcher_repository_url
-      BINARIES_BUCKET_NAME : module.spacelift.binaries_bucket_name
-
-      # Buckets
-      OBJECT_STORAGE_BUCKET_DELIVERIES               = module.spacelift.deliveries_bucket_name
-      OBJECT_STORAGE_BUCKET_LARGE_QUEUE_MESSAGES     = module.spacelift.large_queue_messages_bucket_name
-      OBJECT_STORAGE_BUCKET_MODULES                  = module.spacelift.modules_bucket_name
-      OBJECT_STORAGE_BUCKET_POLICY_INPUTS            = module.spacelift.policy_inputs_bucket_name
-      OBJECT_STORAGE_BUCKET_RUN_LOGS                 = module.spacelift.run_logs_bucket_name
-      OBJECT_STORAGE_BUCKET_STATES                   = module.spacelift.states_bucket_name
-      OBJECT_STORAGE_BUCKET_USER_UPLOADED_WORKSPACES = module.spacelift.user_uploaded_workspaces_bucket_name
-      OBJECT_STORAGE_BUCKET_WORKSPACE                = module.spacelift.workspace_bucket_name
-      OBJECT_STORAGE_BUCKET_METADATA                 = module.spacelift.metadata_bucket_name
-      OBJECT_STORAGE_BUCKET_UPLOADS                  = module.spacelift.uploads_bucket_name
-      OBJECT_STORAGE_BUCKET_UPLOADS_URL              = module.spacelift.uploads_bucket_url
-
-      # Database
-      DATABASE_URL           = module.spacelift.database_url
-      DATABASE_READ_ONLY_URL = module.spacelift.database_read_only_url
-
-      # Encryption
-      ENCRYPTION_TYPE                  = "kms"
-      ENCRYPTION_KMS_ENCRYPTION_KEY_ID = module.spacelift.kms_encryption_key_arn
-      ENCRYPTION_KMS_SIGNING_KEY_ID    = module.spacelift.kms_signing_key_arn
+      PRIVATE_ECR_LOGIN_URL = split("/", module.spacelift.ecr_backend_repository_url)[0]
+      BACKEND_IMAGE         = module.spacelift.ecr_backend_repository_url
+      LAUNCHER_IMAGE        = module.spacelift.ecr_launcher_repository_url
+      BINARIES_BUCKET_NAME  = module.spacelift.binaries_bucket_name
 
       # EKS
       EKS_CLUSTER_NAME = local.cluster_name
+      K8S_NAMESPACE    = var.k8s_namespace
     },
   })
 }
@@ -68,6 +46,41 @@ output "security_group_policies" {
     ]
     namespace                     = var.k8s_namespace
     clusterPrimarySecurityGroupId = module.eks.cluster_primary_security_group_id
+  })
+}
+
+output "kubernetes_secrets" {
+  sensitive   = true
+  description = "Kubernetes secrets required for the Spacelift services. This output is just included as a convenience for use as part of the EKS getting started guide."
+  value = templatefile("${path.module}/kubernetes-secrets.tftpl", {
+    namespace                                      = var.k8s_namespace
+    AWS_ACCOUNT_ID                                 = data.aws_caller_identity.current.account_id
+    AWS_REGION                                     = var.aws_region
+    SERVER_DOMAIN                                  = var.server_domain
+    MQTT_BROKER_DOMAIN                             = coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
+    ENCRYPTION_TYPE                                = "kms"
+    ENCRYPTION_KMS_ENCRYPTION_KEY_ID               = module.spacelift.kms_encryption_key_arn
+    ENCRYPTION_KMS_SIGNING_KEY_ID                  = module.spacelift.kms_signing_key_arn
+    OBJECT_STORAGE_BUCKET_DELIVERIES               = module.spacelift.deliveries_bucket_name
+    OBJECT_STORAGE_BUCKET_LARGE_QUEUE_MESSAGES     = module.spacelift.large_queue_messages_bucket_name
+    OBJECT_STORAGE_BUCKET_MODULES                  = module.spacelift.modules_bucket_name
+    OBJECT_STORAGE_BUCKET_POLICY_INPUTS            = module.spacelift.policy_inputs_bucket_name
+    OBJECT_STORAGE_BUCKET_RUN_LOGS                 = module.spacelift.run_logs_bucket_name
+    OBJECT_STORAGE_BUCKET_STATES                   = module.spacelift.states_bucket_name
+    OBJECT_STORAGE_BUCKET_USER_UPLOADED_WORKSPACES = module.spacelift.user_uploaded_workspaces_bucket_name
+    OBJECT_STORAGE_BUCKET_WORKSPACE                = module.spacelift.workspace_bucket_name
+    OBJECT_STORAGE_BUCKET_METADATA                 = module.spacelift.metadata_bucket_name
+    OBJECT_STORAGE_BUCKET_UPLOADS                  = module.spacelift.uploads_bucket_name
+    OBJECT_STORAGE_BUCKET_UPLOADS_URL              = module.spacelift.uploads_bucket_url
+    DATABASE_URL                                   = module.spacelift.database_url
+    DATABASE_READ_ONLY_URL                         = module.spacelift.database_read_only_url
+    LICENSE_TOKEN                                  = var.license_token != null ? var.license_token : ""
+    SPACELIFT_PUBLIC_API                           = var.spacelift_public_api != null ? var.spacelift_public_api : ""
+    WEBHOOKS_ENDPOINT                              = "https://${var.server_domain}/webhooks"
+    LAUNCHER_IMAGE                                 = module.spacelift.ecr_launcher_repository_url
+    SPACELIFT_VERSION                              = var.spacelift_version != null ? var.spacelift_version : ""
+    ADMIN_USERNAME                                 = var.admin_username != null ? var.admin_username : ""
+    ADMIN_PASSWORD                                 = var.admin_password != null ? var.admin_password : ""
   })
 }
 
