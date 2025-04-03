@@ -247,3 +247,9 @@ variable "admin_password" {
   default     = ""
   sensitive   = true
 }
+
+variable "server_acm_arn" {
+  type        = string
+  description = "AWS Certificate Manager ARN for the server certificate. Only required for generating the helm_values output. It can be ignored if you are not using that output."
+  default     = ""
+}
