@@ -6,22 +6,7 @@ output "shell" {
       AWS_ACCOUNT_ID    = data.aws_caller_identity.current.account_id
       AWS_REGION        = var.aws_region
       SERVER_DOMAIN     = var.server_domain
-      WEBHOOKS_ENDPOINT = "https://${var.server_domain}/webhooks"
       SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
-
-      # IAM
-      SERVER_SERVICE_ACCOUNT_NAME    = var.server_service_account_name
-      SERVER_ROLE_ARN                = module.iam.server_role_arn
-      DRAIN_SERVICE_ACCOUNT_NAME     = var.drain_service_account_name
-      DRAIN_ROLE_ARN                 = module.iam.drain_role_arn
-      SCHEDULER_SERVICE_ACCOUNT_NAME = var.scheduler_service_account_name
-      SCHEDULER_ROLE_ARN             = module.iam.scheduler_role_arn
-
-      # Network
-      SERVER_SECURITY_GROUP_ID               = local.server_security_group_id
-      SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
-      DRAIN_SECURITY_GROUP_ID                = local.drain_security_group_id
-      SCHEDULER_SECURITY_GROUP_ID            = local.scheduler_security_group_id
 
       # Artifacts
       PRIVATE_ECR_LOGIN_URL = split("/", module.spacelift.ecr_backend_repository_url)[0]
@@ -81,6 +66,37 @@ output "kubernetes_secrets" {
     SPACELIFT_VERSION                              = var.spacelift_version != null ? var.spacelift_version : ""
     ADMIN_USERNAME                                 = var.admin_username != null ? var.admin_username : ""
     ADMIN_PASSWORD                                 = var.admin_password != null ? var.admin_password : ""
+  })
+}
+
+output "helm_values" {
+  description = "Generates a Helm values.yaml file that can be used when deploying Spacelift. This output is just included as a convenience for use as part of the EKS getting started guide."
+  value = templatefile("${path.module}/helm-values.tftpl", {
+    SERVER_DOMAIN     = var.server_domain
+    BACKEND_IMAGE     = module.spacelift.ecr_backend_repository_url
+    SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
+
+    # Server
+    SERVER_SECURITY_GROUP_ID    = local.server_security_group_id
+    SERVER_SERVICE_ACCOUNT_NAME = var.server_service_account_name
+    SERVER_ROLE_ARN             = module.iam.server_role_arn
+
+    # Drian
+    DRAIN_SECURITY_GROUP_ID    = local.drain_security_group_id
+    DRAIN_SERVICE_ACCOUNT_NAME = var.drain_service_account_name
+    DRAIN_ROLE_ARN             = module.iam.drain_role_arn
+
+    # Scheduler
+    SCHEDULER_SECURITY_GROUP_ID    = local.scheduler_security_group_id
+    SCHEDULER_SERVICE_ACCOUNT_NAME = var.scheduler_service_account_name
+    SCHEDULER_ROLE_ARN             = module.iam.scheduler_role_arn
+
+    # Ingress
+    SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
+    SERVER_ACM_ARN                         = var.server_acm_arn != null ? var.server_acm_arn : ""
+
+    # MQTT
+    EXTERNAL_WORKERS_ENABLED = var.mqtt_broker_domain != null && var.mqtt_broker_domain != ""
   })
 }
 

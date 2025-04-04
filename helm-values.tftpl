@@ -1,0 +1,69 @@
+shared:
+  serverHostname: "${SERVER_DOMAIN}"
+  image: "${BACKEND_IMAGE}:${SPACELIFT_VERSION}"
+  secretRef: "spacelift-shared"
+
+serviceAccount:
+  # We disable creating a single service account for all the services because we're
+  # going to create a separate service account for each service to give them separate
+  # IAM roles.
+  create: false
+
+server:
+  secretRef: "spacelift-server"
+  podLabels:
+    # This pod label is used to connect the Server pods to their associated SecurityGroupPolicy.
+    spacelift.io/security-group-id: "${SERVER_SECURITY_GROUP_ID}"
+  serviceAccount:
+    create: true
+    name: "${SERVER_SERVICE_ACCOUNT_NAME}"
+    annotations:
+      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
+      # associated AWS IAM role.
+      eks.amazonaws.com/role-arn: "${SERVER_ROLE_ARN}"
+
+drain:
+  secretRef: "spacelift-drain"
+  podLabels:
+    # This pod label is used to connect the Drain pods to their associated SecurityGroupPolicy.
+    spacelift.io/security-group-id: "${DRAIN_SECURITY_GROUP_ID}"
+  serviceAccount:
+    create: true
+    name: "${DRAIN_SERVICE_ACCOUNT_NAME}"
+    annotations:
+      eks.amazonaws.com/role-arn: "${DRAIN_ROLE_ARN}"
+
+scheduler:
+  podLabels:
+    spacelift.io/security-group-id: "${SCHEDULER_SECURITY_GROUP_ID}"
+  serviceAccount:
+    create: true
+    name: "${SCHEDULER_SERVICE_ACCOUNT_NAME}"
+    annotations:
+      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
+      # associated AWS IAM role.
+      eks.amazonaws.com/role-arn: "${SCHEDULER_ROLE_ARN}"
+
+ingress:
+  enabled: true
+  # We set the ingress class to automatically create an ALB for accessing the server.
+  ingressClassName: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/security-groups: "${SERVER_LOAD_BALANCER_SECURITY_GROUP_ID}"
+    alb.ingress.kubernetes.io/certificate-arn: "${SERVER_ACM_ARN}"
+    alb.ingress.kubernetes.io/target-type: "ip"
+
+ingressV6:
+  enabled: false
+
+%{ if EXTERNAL_WORKERS_ENABLED ~}
+# When connecting workers that are running outside your EKS cluster to Spacelift, we need to
+# expose the MQTT broker using an NLB. We do this by configuring the MQTT Service as follows:
+mqttService:
+  type: "LoadBalancer"
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+%{ endif ~}
