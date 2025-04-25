@@ -1,0 +1,25 @@
+apiVersion: eks.amazonaws.com/v1
+kind: IngressClassParams
+metadata:
+  name: spacelift
+spec:
+  scheme: internet-facing
+  subnets:
+    ids:
+%{ for subnet_id in PUBLIC_SUBNET_IDS }
+      - "${subnet_id}"
+%{~ endfor }
+  certificateARNs:
+    - "${SERVER_ACM_ARN}"
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: spacelift
+spec:
+  # Configures the IngressClass to use EKS Auto Mode
+  controller: eks.amazonaws.com/alb
+  parameters:
+    apiGroup: eks.amazonaws.com
+    kind: IngressClassParams
+    name: spacelift

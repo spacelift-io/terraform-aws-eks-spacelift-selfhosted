@@ -11,9 +11,6 @@ serviceAccount:
 
 server:
   secretRef: "spacelift-server"
-  podLabels:
-    # This pod label is used to connect the Server pods to their associated SecurityGroupPolicy.
-    spacelift.io/security-group-id: "${SERVER_SECURITY_GROUP_ID}"
   serviceAccount:
     create: true
     name: "${SERVER_SERVICE_ACCOUNT_NAME}"
@@ -24,18 +21,15 @@ server:
 
 drain:
   secretRef: "spacelift-drain"
-  podLabels:
-    # This pod label is used to connect the Drain pods to their associated SecurityGroupPolicy.
-    spacelift.io/security-group-id: "${DRAIN_SECURITY_GROUP_ID}"
   serviceAccount:
     create: true
     name: "${DRAIN_SERVICE_ACCOUNT_NAME}"
     annotations:
+      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
+      # associated AWS IAM role.
       eks.amazonaws.com/role-arn: "${DRAIN_ROLE_ARN}"
 
 scheduler:
-  podLabels:
-    spacelift.io/security-group-id: "${SCHEDULER_SECURITY_GROUP_ID}"
   serviceAccount:
     create: true
     name: "${SCHEDULER_SERVICE_ACCOUNT_NAME}"
@@ -46,13 +40,9 @@ scheduler:
 
 ingress:
   enabled: true
-  # We set the ingress class to automatically create an ALB for accessing the server.
-  ingressClassName: "alb"
-  annotations:
-    alb.ingress.kubernetes.io/scheme: "internet-facing"
-    alb.ingress.kubernetes.io/security-groups: "${SERVER_LOAD_BALANCER_SECURITY_GROUP_ID}"
-    alb.ingress.kubernetes.io/certificate-arn: "${SERVER_ACM_ARN}"
-    alb.ingress.kubernetes.io/target-type: "ip"
+  # We use the spacelift ingress class to automatically create an ALB and use the correct TLS
+  # certificate for the server.
+  ingressClassName: "spacelift"
 
 ingressV6:
   enabled: false

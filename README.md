@@ -115,9 +115,6 @@ module "spacelift" {
   # security groups. Take a look at https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted/blob/main/modules/network/security_groups.tf
   # for an example of how these should be defined.
   rds_security_group_ids      = [aws_security_group.database_sg.id]
-  server_security_group_id    = aws_security_group.server_sg.id
-  drain_security_group_id     = aws_security_group.drain_sg.id
-  scheduler_security_group_id = aws_security_group.scheduler_sg.id
 
   eks_cluster_name = local.cluster_name
 }

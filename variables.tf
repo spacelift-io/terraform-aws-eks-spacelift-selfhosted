@@ -39,23 +39,6 @@ variable "public_subnet_ids" {
   default     = []
 }
 
-# TODO(adamc): check if we can just remove the server SG and allow the LB controller to configure the rules
-variable "server_security_group_id" {
-  type        = string
-  description = "The security group to use for the server. Used when configuring load balancer rules. If create_vpc is false, this must be provided."
-  default     = null
-}
-variable "drain_security_group_id" {
-  type        = string
-  description = "The security group to use for the drain. Used when configuring load balancer rules. If create_vpc is false, this must be provided."
-  default     = null
-}
-variable "scheduler_security_group_id" {
-  type        = string
-  description = "The security group to use for the scheduler. Used when configuring load balancer rules. If create_vpc is false, this must be provided."
-  default     = null
-}
-
 variable "create_database" {
   type        = bool
   description = "Whether to create the Aurora RDS database. Default is true."
@@ -203,16 +186,6 @@ variable "scheduler_service_account_name" {
 
 variable "eks_cluster_name" {
   description = "A custom name to use for the EKS cluster. By default one will be generated for you."
-  default     = null
-}
-
-variable "eks_managed_node_group_defaults" {
-  description = "Any default node group configuration. By default all nodes will be attached to the private subnets and will have the cluster primary security group attached."
-  default     = null
-}
-
-variable "eks_managed_node_groups" {
-  description = "The configuration for any EKS managed node groups."
   default     = null
 }
 
