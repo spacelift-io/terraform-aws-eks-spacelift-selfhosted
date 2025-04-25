@@ -8,12 +8,9 @@ locals {
   unique_suffix = lower(substr(random_uuid.suffix.id, 0, 5))
   cluster_name  = coalesce(var.eks_cluster_name, "spacelift-cluster-${module.spacelift.unique_suffix}")
 
-  vpc_id                      = var.create_vpc ? module.spacelift.vpc_id : var.vpc_id
-  private_subnet_ids          = var.create_vpc ? module.spacelift.private_subnet_ids : var.private_subnet_ids
-  public_subnet_ids           = var.create_vpc ? module.spacelift.public_subnet_ids : var.public_subnet_ids
-  server_security_group_id    = var.create_vpc ? module.spacelift.server_security_group_id : var.server_security_group_id
-  drain_security_group_id     = var.create_vpc ? module.spacelift.drain_security_group_id : var.drain_security_group_id
-  scheduler_security_group_id = var.create_vpc ? module.spacelift.scheduler_security_group_id : var.scheduler_security_group_id
+  vpc_id             = var.create_vpc ? module.spacelift.vpc_id : var.vpc_id
+  private_subnet_ids = var.create_vpc ? module.spacelift.private_subnet_ids : var.private_subnet_ids
+  public_subnet_ids  = var.create_vpc ? module.spacelift.public_subnet_ids : var.public_subnet_ids
 }
 
 module "spacelift" {
@@ -81,13 +78,4 @@ module "iam" {
   server_service_account_name          = var.server_service_account_name
   drain_service_account_name           = var.drain_service_account_name
   scheduler_service_account_name       = var.scheduler_service_account_name
-}
-
-module "lb" {
-  source = "./modules/lb"
-
-  unique_suffix            = module.spacelift.unique_suffix
-  vpc_id                   = local.vpc_id
-  server_security_group_id = local.server_security_group_id
-  server_port              = var.server_port
 }

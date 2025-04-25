@@ -21,16 +21,11 @@ output "shell" {
   })
 }
 
-output "security_group_policies" {
-  description = "Kubernetes security group policies for Spacelift. These K8s objects must be deployed to the cluster for the security groups to be used by the pods."
-  value = templatefile("${path.module}/security-group-policies.tftpl", {
-    securityGroupIds = [
-      local.server_security_group_id,
-      local.drain_security_group_id,
-      local.scheduler_security_group_id
-    ]
-    namespace                     = var.k8s_namespace
-    clusterPrimarySecurityGroupId = module.eks.cluster_primary_security_group_id
+output "kubernetes_ingress_class" {
+  description = "Generates an IngressClassParameters and IngressClass resource to configure the server load balancer. This output is just included as a convenience for use as part of the EKS getting started guide."
+  value = templatefile("${path.module}/kubernetes-ingress-class.tftpl", {
+    PUBLIC_SUBNET_IDS = local.public_subnet_ids
+    SERVER_ACM_ARN    = var.server_acm_arn != null ? var.server_acm_arn : ""
   })
 }
 
@@ -77,23 +72,19 @@ output "helm_values" {
     SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
 
     # Server
-    SERVER_SECURITY_GROUP_ID    = local.server_security_group_id
     SERVER_SERVICE_ACCOUNT_NAME = var.server_service_account_name
     SERVER_ROLE_ARN             = module.iam.server_role_arn
 
     # Drian
-    DRAIN_SECURITY_GROUP_ID    = local.drain_security_group_id
     DRAIN_SERVICE_ACCOUNT_NAME = var.drain_service_account_name
     DRAIN_ROLE_ARN             = module.iam.drain_role_arn
 
     # Scheduler
-    SCHEDULER_SECURITY_GROUP_ID    = local.scheduler_security_group_id
     SCHEDULER_SERVICE_ACCOUNT_NAME = var.scheduler_service_account_name
     SCHEDULER_ROLE_ARN             = module.iam.scheduler_role_arn
 
     # Ingress
-    SERVER_LOAD_BALANCER_SECURITY_GROUP_ID = module.lb.load_balancer_security_group_id
-    SERVER_ACM_ARN                         = var.server_acm_arn != null ? var.server_acm_arn : ""
+    SERVER_ACM_ARN = var.server_acm_arn != null ? var.server_acm_arn : ""
 
     # MQTT
     EXTERNAL_WORKERS_ENABLED = var.mqtt_broker_domain != null && var.mqtt_broker_domain != ""
@@ -175,11 +166,6 @@ output "scheduler_role_arn" {
   description = "ARN of the IAM role for the Spacelift scheduler."
 }
 
-output "load_balancer_security_group_id" {
-  value       = module.lb.load_balancer_security_group_id
-  description = "ID of the security group for the load balancer."
-}
-
 output "mqtt_broker_domain" {
   value       = coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
   description = "Domain name of the MQTT broker."
@@ -198,21 +184,6 @@ output "kms_encryption_key_arn" {
 output "kms_signing_key_arn" {
   value       = module.spacelift.kms_signing_key_arn
   description = "ARN of the KMS key used for signing and verifying JWTs."
-}
-
-output "server_security_group_id" {
-  value       = local.server_security_group_id
-  description = "ID of the security group for the Spacelift HTTP server."
-}
-
-output "drain_security_group_id" {
-  value       = local.drain_security_group_id
-  description = "ID of the security group for the Spacelift async-processing service."
-}
-
-output "scheduler_security_group_id" {
-  value       = local.scheduler_security_group_id
-  description = "ID of the security group for the Spacelift scheduler service."
 }
 
 output "database_security_group_id" {
