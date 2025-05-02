@@ -43,6 +43,13 @@ ingress:
   # We use the spacelift ingress class to automatically create an ALB and use the correct TLS
   # certificate for the server.
   ingressClassName: "spacelift"
+  annotations:
+    # We want to point the ALB health checks at the readiness endpoint of the instrumentation server rather than
+    # the default value of the traffic port. This helps ensure the probes start failing as quickly as possible,
+    # even if the main HTTP server hasn't finished shutting down yet.
+    alb.ingress.kubernetes.io/healthcheck-port: "8080"
+    alb.ingress.kubernetes.io/healthcheck-path: "/readiness"
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "10"
 
 ingressV6:
   enabled: false
