@@ -2,8 +2,6 @@
 
 This module creates the base infrastructure for a self-hosted Spacelift instance running on AWS EKS. The module is intended to be used alongside the EKS getting started guide in our documentation.
 
-If you only want to deploy the Spacelift-specific infrastructure, and have an existing EKS cluster that you want to deploy Spacelift to, you may want to take a look at our [terraform-aws-spacelift-selfhosted](https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted) and [terraform-aws-iam-spacelift-selfhosted](https://github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted) modules.
-
 **Please note:** this module is intended as an example of how to quickly deploy Spacelift to EKS, and should not be used as an example of best-practices for deploying EKS clusters.
 
 ## State storage
@@ -60,6 +58,40 @@ module "spacelift" {
 
   # The domain workers should use to connect to the Spacelift MQTT broker. For example mqtt.spacelift.example.com.
   mqtt_broker_domain = var.mqtt_broker_domain
+}
+```
+
+### Use an existing EKS cluster
+
+If you only want to deploy the Spacelift-specific infrastructure, and have an existing EKS cluster that you want to deploy Spacelift to, you may want to take a look at our [terraform-aws-spacelift-selfhosted](https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted) and [terraform-aws-iam-spacelift-selfhosted](https://github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted) modules.
+
+See below for an example.
+
+```hcl
+
+module "spacelift" {
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v1.3.1"
+  # ...
+}
+
+module "iam_roles_and_policies" {
+  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.2.2"
+  kubernetes_role_assumption_config = {
+    # The OIDC provider of the existing EKS cluster
+    oidc_provider = "oidc.eks.region.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE"
+  }
+}
+
+# Allow the cluster nodes to access the database.
+resource "aws_vpc_security_group_ingress_rule" "cluster_database_ingress_rule" {
+  # If you deploy into an existing VPC, don't use the module output here and provide the VPC ID yourself instead.
+  security_group_id            = module.spacelift.database_security_group_id
+  description                  = "Only accept TCP connections on appropriate port from EKS cluster nodes"
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  // ID of the primary security group of the existing EKS cluster
+  referenced_security_group_id = "sg-01234567890abcdef"
 }
 ```
 
