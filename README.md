@@ -68,19 +68,23 @@ If you only want to deploy the Spacelift-specific infrastructure, and have an ex
 See below for an example.
 
 ```hcl
-
 module "spacelift" {
   source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v1.3.1"
   # ...
 }
 
-module "iam_roles_and_policies" {
-  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.2.2"
-  kubernetes_role_assumption_config = {
-    # The OIDC provider of the existing EKS cluster
-    oidc_provider = "oidc.eks.region.amazonaws.com/id/EXAMPLED539D4633E53DE1B71EXAMPLE"
-  }
+module "iam" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v2.2.0"
+  # ...
 }
+
+module "kube_outputs" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v2.2.0"
+  # ...
+}
+```
+
+See a full example in the [examples/byo_eks_cluster](examples/byo_eks_cluster) directory.
 
 # Allow the cluster nodes to access the database.
 resource "aws_vpc_security_group_ingress_rule" "cluster_database_ingress_rule" {
