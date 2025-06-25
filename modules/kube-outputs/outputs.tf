@@ -54,7 +54,7 @@ output "helm_values" {
     SERVER_SERVICE_ACCOUNT_NAME = var.server_service_account_name
     SERVER_ROLE_ARN             = var.server_role_arn
 
-    # Drian
+    # Drain
     DRAIN_SERVICE_ACCOUNT_NAME = var.drain_service_account_name
     DRAIN_ROLE_ARN             = var.drain_role_arn
 
