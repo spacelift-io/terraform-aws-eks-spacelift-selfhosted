@@ -79,3 +79,42 @@ module "iam" {
   drain_service_account_name           = var.drain_service_account_name
   scheduler_service_account_name       = var.scheduler_service_account_name
 }
+
+module "kube_outputs" {
+  source = "./modules/kube-outputs"
+
+  public_subnet_ids                    = local.public_subnet_ids
+  server_acm_arn                       = var.server_acm_arn
+  k8s_namespace                        = var.k8s_namespace
+  aws_region                           = var.aws_region
+  server_domain                        = var.server_domain
+  mqtt_broker_domain                   = var.mqtt_broker_domain
+  kms_encryption_key_arn               = module.spacelift.kms_encryption_key_arn
+  kms_signing_key_arn                  = module.spacelift.kms_signing_key_arn
+  deliveries_bucket_name               = module.spacelift.deliveries_bucket_name
+  large_queue_messages_bucket_name     = module.spacelift.large_queue_messages_bucket_name
+  modules_bucket_name                  = module.spacelift.modules_bucket_name
+  policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
+  run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
+  states_bucket_name                   = module.spacelift.states_bucket_name
+  user_uploaded_workspaces_bucket_name = module.spacelift.user_uploaded_workspaces_bucket_name
+  workspace_bucket_name                = module.spacelift.workspace_bucket_name
+  metadata_bucket_name                 = module.spacelift.metadata_bucket_name
+  uploads_bucket_name                  = module.spacelift.uploads_bucket_name
+  uploads_bucket_url                   = module.spacelift.uploads_bucket_url
+  database_url                         = module.spacelift.database_url
+  database_read_only_url               = module.spacelift.database_read_only_url
+  license_token                        = var.license_token
+  spacelift_public_api                 = var.spacelift_public_api
+  ecr_launcher_repository_url          = module.spacelift.ecr_launcher_repository_url
+  spacelift_version                    = var.spacelift_version
+  admin_username                       = var.admin_username
+  admin_password                       = var.admin_password
+  ecr_backend_repository_url           = module.spacelift.ecr_backend_repository_url
+  server_service_account_name          = var.server_service_account_name
+  drain_service_account_name           = var.drain_service_account_name
+  scheduler_service_account_name       = var.drain_service_account_name
+  server_role_arn                      = module.iam.server_role_arn
+  drain_role_arn                       = module.iam.drain_role_arn
+  scheduler_role_arn                   = module.iam.scheduler_role_arn
+}
