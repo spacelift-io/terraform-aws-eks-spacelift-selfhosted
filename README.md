@@ -86,6 +86,7 @@ module "kube_outputs" {
 
 See a full example in the [examples/byo_eks_cluster](examples/byo_eks_cluster) directory.
 
+```hcl
 # Allow the cluster nodes to access the database.
 resource "aws_vpc_security_group_ingress_rule" "cluster_database_ingress_rule" {
   # If you deploy into an existing VPC, don't use the module output here and provide the VPC ID yourself instead.
@@ -136,7 +137,7 @@ module "vpc" {
   }
 }
 
-module "spacelift" {
+module "spacelift_eks" {
   source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
 
   aws_region         = var.aws_region
