@@ -13,11 +13,6 @@ variable "aws_partition" {
   description = "The AWS partition the services are being run in."
 }
 
-variable "aws_dns_suffix" {
-  type        = string
-  description = "The AWS DNS suffix for the region."
-}
-
 variable "kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key used for encrypting AWS resources (ECR, S3, etc.)."
@@ -106,4 +101,16 @@ variable "drain_service_account_name" {
 variable "scheduler_service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account used by the server."
+}
+
+variable "create_sqs" {
+  type        = bool
+  description = "Whether to create the SQS queues for Spacelift."
+  default     = false
+}
+
+variable "queue_arns" {
+  type        = map(string)
+  default     = null
+  description = "A map of SQS queue names to arns. Only required if create_sqs is false."
 }

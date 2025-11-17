@@ -14,7 +14,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v1.1.0"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=sqs-enabled"
 
   unique_suffix = local.unique_suffix
   region        = var.aws_region
@@ -46,6 +46,8 @@ module "spacelift" {
   rds_preferred_backup_window            = var.rds_preferred_backup_window
   rds_backup_retention_period            = var.rds_backup_retention_period
 
+  create_sqs = var.create_sqs
+
   website_endpoint = "https://${var.server_domain}"
 
   s3_retain_on_destroy       = var.s3_retain_on_destroy
@@ -59,7 +61,6 @@ module "iam" {
   unique_suffix                        = module.spacelift.unique_suffix
   aws_account_id                       = data.aws_caller_identity.current.account_id
   aws_partition                        = data.aws_partition.current.partition
-  aws_dns_suffix                       = data.aws_partition.current.dns_suffix
   kms_key_arn                          = module.spacelift.kms_key_arn
   kms_encryption_key_arn               = module.spacelift.kms_encryption_key_arn
   kms_signing_key_arn                  = module.spacelift.kms_signing_key_arn
@@ -78,6 +79,8 @@ module "iam" {
   server_service_account_name          = var.server_service_account_name
   drain_service_account_name           = var.drain_service_account_name
   scheduler_service_account_name       = var.scheduler_service_account_name
+  create_sqs                           = var.create_sqs
+  queue_arns                           = module.spacelift.sqs_queue_arns
 }
 
 module "kube_outputs" {
@@ -113,8 +116,10 @@ module "kube_outputs" {
   ecr_backend_repository_url           = module.spacelift.ecr_backend_repository_url
   server_service_account_name          = var.server_service_account_name
   drain_service_account_name           = var.drain_service_account_name
-  scheduler_service_account_name       = var.drain_service_account_name
+  scheduler_service_account_name       = var.scheduler_service_account_name
   server_role_arn                      = module.iam.server_role_arn
   drain_role_arn                       = module.iam.drain_role_arn
   scheduler_role_arn                   = module.iam.scheduler_role_arn
+  create_sqs                           = var.create_sqs
+  queue_urls                           = module.spacelift.sqs_queue_urls
 }
