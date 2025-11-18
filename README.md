@@ -10,6 +10,23 @@ Check out the [Terraform](https://developer.hashicorp.com/terraform/language/bac
 
 > ⚠️ Do **not** import the state into Spacelift after the installation: that would cause circular dependencies, and in case you accidentally break the Spacelift installation, you wouldn't be able to fix it.
 
+## 🔐 IAM Permissions
+
+To deploy this module, you'll need AWS credentials with the appropriate IAM permissions. A comprehensive IAM policy document with all required permissions is provided in [terraform-deployment-iam-policy.json](terraform-deployment-iam-policy.json). This policy includes permissions for:
+
+- EKS cluster and node group management
+- VPC and networking resources (subnets, route tables, security groups, NAT gateways, etc.)
+- RDS Aurora database management
+- S3 bucket management for storing Spacelift data
+- ECR repository management for container images
+- KMS key management for encryption
+- IAM role and policy management
+- CloudWatch logs management
+- Load balancer management
+- Auto Scaling groups for EKS node groups
+
+You can attach this policy to the IAM user or role that will be used to deploy the infrastructure.
+
 ## ✨ Usage
 
 ```hcl
