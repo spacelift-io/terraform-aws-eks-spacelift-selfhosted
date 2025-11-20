@@ -1,5 +1,5 @@
 module "iam_roles_and_policies" {
-  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=sqs-enabled"
+  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.3.1"
 
   write_as_files = false
   kubernetes_role_assumption_config = {
