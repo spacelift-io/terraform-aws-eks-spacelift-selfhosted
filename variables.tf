@@ -9,6 +9,12 @@ variable "kms_arn" {
   default     = null
 }
 
+variable "create_sqs" {
+  type        = bool
+  description = "Whether to create the SQS queues for Spacelift."
+  default     = false
+}
+
 variable "create_vpc" {
   type        = bool
   description = "Whether to create a VPC for the Spacelift resources. Default is true. Note: if this is false, and create_database is true, you must provide rds_subnet_ids and rds_security_group_ids."

@@ -40,6 +40,16 @@ output "kubernetes_secrets" {
     SPACELIFT_VERSION                              = var.spacelift_version != null ? var.spacelift_version : ""
     ADMIN_USERNAME                                 = var.admin_username != null ? var.admin_username : ""
     ADMIN_PASSWORD                                 = var.admin_password != null ? var.admin_password : ""
+
+    MESSAGE_QUEUE_TYPE                 = var.create_sqs ? "sqs" : "postgres"
+    MESSAGE_QUEUE_SQS_ASYNC_URL        = local.async_jobs_queue_url
+    MESSAGE_QUEUE_SQS_ASYNC_FIFO_URL   = local.async_jobs_fifo_queue_url
+    MESSAGE_QUEUE_SQS_CRONJOBS_URL     = local.cronjobs_queue_url
+    MESSAGE_QUEUE_SQS_DLQ_URL          = local.deadletter_queue_url
+    MESSAGE_QUEUE_SQS_DLQ_FIFO_URL     = local.deadletter_fifo_queue_url
+    MESSAGE_QUEUE_SQS_EVENTS_INBOX_URL = local.events_inbox_queue_url
+    MESSAGE_QUEUE_SQS_IOT_URL          = local.iot_queue_url
+    MESSAGE_QUEUE_SQS_WEBHOOKS_URL     = local.webhooks_queue_url
   })
 }
 

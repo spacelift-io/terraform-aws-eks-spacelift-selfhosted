@@ -183,3 +183,15 @@ variable "scheduler_role_arn" {
   type        = string
   description = "The ARN of the IAM role to use for the scheduler service account."
 }
+
+variable "create_sqs" {
+  type        = bool
+  description = "Whether to create the SQS queues for Spacelift."
+  default     = false
+}
+
+variable "queue_urls" {
+  type        = map(string)
+  default     = null
+  description = "A map of SQS queue names to urls. Only required if create_sqs is false."
+}

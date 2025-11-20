@@ -157,11 +157,6 @@ output "vpc_id" {
   description = "ID of the VPC. It will be null if create_vpc is false."
 }
 
-output "rds_global_cluster_id" {
-  description = "ID of the global Aurora cluster. Will be null if create_database is false."
-  value       = var.create_database ? module.spacelift.rds_global_cluster_id : null
-}
-
 output "rds_cluster_endpoint" {
   description = "Endpoint of the RDS cluster. Will be null if create_database is false."
   value       = var.create_database ? module.spacelift.rds_cluster_endpoint : null
