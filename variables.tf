@@ -148,6 +148,12 @@ variable "s3_retain_on_destroy" {
   default     = true
 }
 
+variable "enable_public_access_block_on_s3" {
+  type        = bool
+  description = "Whether to enable the public access block on the bucket."
+  default     = true
+}
+
 variable "number_of_images_to_retain" {
   type        = number
   description = "Number of Docker images to retain in ECR repositories. Default is 5. If set to 0, no images will be cleaned up."
