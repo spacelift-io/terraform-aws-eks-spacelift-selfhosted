@@ -50,9 +50,10 @@ module "spacelift" {
 
   website_endpoint = "https://${var.server_domain}"
 
-  s3_retain_on_destroy       = var.s3_retain_on_destroy
-  number_of_images_to_retain = var.number_of_images_to_retain
-  ecr_force_delete           = var.ecr_force_delete
+  s3_retain_on_destroy             = var.s3_retain_on_destroy
+  enable_public_access_block_on_s3 = var.enable_public_access_block_on_s3
+  number_of_images_to_retain       = var.number_of_images_to_retain
+  ecr_force_delete                 = var.ecr_force_delete
 }
 
 module "iam" {
