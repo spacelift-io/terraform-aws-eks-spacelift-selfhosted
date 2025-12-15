@@ -174,6 +174,33 @@ module "spacelift_eks" {
 }
 ```
 
+## Account-Level EBS Encryption
+
+If your AWS account enforces EBS encryption by default, set `ebs_encryption.enabled = true`. This creates a dedicated KMS key for EBS volumes with the proper permissions for EKS Auto Mode.
+To use an existing KMS key, set `ebs_encryption.kms_key_arn`, if unset the module will create a new key.
+
+```hcl
+module "spacelift_eks" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
+
+  aws_region    = var.aws_region
+  server_domain = var.server_domain
+
+  ebs_encryption = {
+    enabled = true
+    kms_key_arn = "arn:aws:kms:us-west-1:123456789012:key/12345678-1234-1234-1234-123456789012" # dont set this to allow the module to create a new key
+  }
+}
+```
+
+After applying, patch your NodeClass to use the KMS key:
+
+```bash
+$(tofu output -raw ebs_encrypted_volumes_patch)
+```
+
+This addresses [terraform-aws-eks#3037](https://github.com/terraform-aws-modules/terraform-aws-eks/issues/3037). See [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/auto-kms.html) for details.
+
 ## 🚀 Release
 
 To release a new version of the module, just create a new release with an appropriate tag in GitHub releases.
