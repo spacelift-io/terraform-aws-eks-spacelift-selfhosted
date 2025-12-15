@@ -238,3 +238,14 @@ variable "server_acm_arn" {
   description = "AWS Certificate Manager ARN for the server certificate. Only required for generating the helm_values output. It can be ignored if you are not using that output."
   default     = ""
 }
+
+variable "ebs_encryption" {
+  type = object({
+    enabled : bool,
+    kms_key_arn : optional(string)
+  })
+  description = "Whether the AWS account enforces EBS encryption by default. If true, a separate KMS key will be created for node EBS volumes with the appropriate permissions for EKS Auto Mode. See https://github.com/terraform-aws-modules/terraform-aws-eks/issues/3037 for more information."
+  default = {
+    enabled = false
+  }
+}

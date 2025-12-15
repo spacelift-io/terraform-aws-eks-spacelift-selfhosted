@@ -324,3 +324,18 @@ output "workspace_bucket_name" {
   value       = module.spacelift.workspace_bucket_name
   description = "ID of the S3 bucket used for storing workspaces."
 }
+
+output "ebs_kms_key_arn" {
+  value       = local.create_ebs_key ? aws_kms_key.ebs[0].arn : var.ebs_encryption.kms_key_arn
+  description = "ARN of the KMS key used for EBS volume encryption. Only set when account_enforces_ebs_encryption is true."
+}
+
+output "ebs_kms_key_id" {
+  value       = local.create_ebs_key ? aws_kms_key.ebs[0].key_id : null
+  description = "ID of the KMS key used for EBS volume encryption. Only set when account_enforces_ebs_encryption is true."
+}
+
+output "ebs_encrypted_volumes_patch" {
+  value       = var.ebs_encryption.enabled ? "kubectl patch nodeclass default --type=merge -p '{\"spec\":{\"ephemeralStorage\":{\"kmsKeyID\":\"${local.ebs_kms_key_arn}\"}}}'" : "echo \"account_enforces_ebs_encryption is not enabled\""
+  description = "kubectl command to patch the default NodeClass with the EBS KMS key. Execute with: $(tofu output -raw ebs_encrypted_volumes_patch)"
+}
