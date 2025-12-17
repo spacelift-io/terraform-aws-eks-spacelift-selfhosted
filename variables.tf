@@ -249,3 +249,9 @@ variable "ebs_encryption" {
     enabled = false
   }
 }
+
+variable "availability_zones" {
+  type        = list(string)
+  description = "overriding aws availability zones"
+  default     = null
+}
