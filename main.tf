@@ -54,6 +54,7 @@ module "spacelift" {
   enable_public_access_block_on_s3 = var.enable_public_access_block_on_s3
   number_of_images_to_retain       = var.number_of_images_to_retain
   ecr_force_delete                 = var.ecr_force_delete
+  availability_zones               = var.availability_zones
 }
 
 module "iam" {
