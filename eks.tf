@@ -30,9 +30,9 @@ module "eks" {
 
 # Allow the cluster nodes to access the database.
 resource "aws_vpc_security_group_ingress_rule" "cluster_database_ingress_rule" {
-  for_each = toset(module.spacelift.database_security_group_ids)
+  count = length(coalesce(module.spacelift.database_security_group_ids, []))
 
-  security_group_id = each.value
+  security_group_id = module.spacelift.database_security_group_ids[count.index]
 
   description                  = "Only accept TCP connections on appropriate port from EKS cluster nodes"
   from_port                    = 5432
