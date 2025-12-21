@@ -1,14 +1,12 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "~> 21.0"
 
-  cluster_name    = local.cluster_name
-  cluster_version = var.eks_cluster_version
-
-  bootstrap_self_managed_addons = false
+  name               = local.cluster_name
+  kubernetes_version = var.eks_cluster_version
 
   # The Kubernetes API endpoint will be accessible via the public internet.
-  cluster_endpoint_public_access = true
+  endpoint_public_access = true
 
   # Adds the current caller identity as an administrator via cluster access entry. This is required
   # in order to install the cluster addons.
@@ -18,7 +16,7 @@ module "eks" {
   subnet_ids = local.private_subnet_ids
 
   # Enable EKS Auto mode using a general purpose node pool
-  cluster_compute_config = {
+  compute_config = {
     enabled    = true
     node_pools = ["general-purpose"]
   }
