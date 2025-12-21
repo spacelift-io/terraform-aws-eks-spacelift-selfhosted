@@ -1,0 +1,12 @@
+version: 2
+
+# The version here is arbitrary and not being used anywhere.
+# We just need to bump it if we want the tests to be running, as they don't run for
+# versions that already exist.
+module_version: "0.0.1"
+
+tests:
+  - name: Basic example
+    project_root: examples/basic-example
+    environment:
+      TF_VAR_aws_region: "eu-west-2"

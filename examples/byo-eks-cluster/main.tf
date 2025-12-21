@@ -1,9 +1,17 @@
+data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
+data "aws_region" "current" {}
+
 locals {
-  aws_region       = "{your-aws-region}"
-  aws_account_id   = "{your-aws-account-id}"
-  aws_dns_suffix   = "{your-aws-dns-suffix}"
-  aws_partition    = "{your-aws-partition}"
-  oidc_provider    = "{your-oidc-provider}" # Example: https://github.com/terraform-aws-modules/terraform-aws-eks/blob/v20.37.0/outputs.tf#L159
+  aws_region     = data.aws_region.current.name
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_dns_suffix = data.aws_partition.current.dns_suffix
+  aws_partition  = data.aws_partition.current.partition
+
+  # Replace with your EKS cluster OIDC issuer URL
+  # If using terraform-aws-modules/eks/aws: module.eks.cluster_oidc_issuer_url
+  # See: https://github.com/terraform-aws-modules/terraform-aws-eks/blob/v21.10.1/outputs.tf#L50
+  oidc_provider    = try(aws_eks_cluster.this[0].identity[0].oidc[0].issuer, null)
   website_endpoint = "{your-server-domain}" # Example: spacelift.example.com
 
   drain_service_account_name     = "spacelift-drain"
@@ -19,7 +27,7 @@ module "spacelift" {
 }
 
 module "iam" {
-  source                               = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v2.2.0"
+  source                               = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v3.0.0"
   aws_account_id                       = local.aws_account_id
   aws_dns_suffix                       = local.aws_dns_suffix
   aws_partition                        = local.aws_partition
@@ -45,7 +53,7 @@ module "iam" {
 }
 
 module "kube_outputs" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v2.2.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v3.0.0"
 
   aws_region                           = local.aws_region
   database_read_only_url               = module.spacelift.database_read_only_url

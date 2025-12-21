@@ -79,7 +79,6 @@ variable "rds_delete_protection_enabled" {
 variable "rds_engine_version" {
   type        = string
   description = "Postgres engine version."
-  default     = "16.6"
 }
 
 variable "rds_engine_mode" {
@@ -169,7 +168,6 @@ variable "ecr_force_delete" {
 variable "eks_cluster_version" {
   type        = string
   description = "The Kubernetes version to run on the cluster."
-  default     = "1.32"
 }
 
 variable "k8s_namespace" {

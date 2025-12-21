@@ -1,5 +1,67 @@
 # ☁️ Terraform module for Spacelift on Elastic Kubernetes Service
 
+> [!IMPORTANT]
+> ## 🔄 Upgrading to v3.0.0 - Breaking changes
+>
+> Click below to see the full upgrade guide with breaking changes.
+
+<details>
+<summary><h3>📋 Full v3.0.0 Upgrade Guide</h3></summary>
+
+### Breaking Changes
+
+#### Mandatory Version Parameters
+
+Two previously optional parameters are now **required** and have no default values:
+
+- **`eks_cluster_version`** - The Kubernetes version for your EKS cluster (previously defaulted to `"1.32"`)
+- **`rds_engine_version`** - The PostgreSQL engine version for RDS (previously defaulted to `"16.6"`)
+
+**Why this change?** Hardcoded defaults prevent us from ever updating them without causing unexpected infrastructure changes for existing users. Explicit version specification is simpler and gives you full control.
+
+**Action Required:** You must explicitly set these values in your module configuration:
+
+```hcl
+module "spacelift" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.x.x"
+
+  # New required parameters
+  eks_cluster_version = "1.32"  # or your preferred Kubernetes version
+  rds_engine_version  = "16.6"  # or your preferred PostgreSQL version
+
+  # ... other variables
+}
+```
+
+### Example Migration
+
+**Before (v2.x.x):**
+```hcl
+module "spacelift" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v2.0.0"
+
+  aws_region    = var.aws_region
+  server_domain = var.server_domain
+}
+```
+
+**After (v3.0.0):**
+```hcl
+module "spacelift" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.0.0"
+
+  aws_region    = var.aws_region
+  server_domain = var.server_domain
+
+  eks_cluster_version = "1.32"  # Now required
+  rds_engine_version  = "16.6"  # Now required
+}
+```
+
+</details>
+
+---
+
 This module creates the base infrastructure for a self-hosted Spacelift instance running on AWS EKS. The module is intended to be used alongside the EKS getting started guide in our documentation.
 
 **Please note:** this module is intended as an example of how to quickly deploy Spacelift to EKS, and should not be used as an example of best-practices for deploying EKS clusters.
@@ -30,10 +92,24 @@ You can attach this policy to the IAM user or role that will be used to deploy t
 ## ✨ Usage
 
 ```hcl
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      "app"         = "spacelift-selfhosted"
+      "environment" = "production"
+    }
+  }
+}
+
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.0.0"
 
   aws_region = var.aws_region
+
+  eks_cluster_version = "1.34" # Kubernetes version
+  rds_engine_version  = "17.7" # Postgres version
 
   # The domain you want to host Spacelift on, for example spacelift.example.com.
   server_domain = var.server_domain
@@ -68,15 +144,17 @@ The module is also available [on the OpenTofu registry](https://search.opentofu.
 
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
 
-  aws_region    = var.aws_region
-  server_domain = var.server_domain
+  # other variables...
 
-  # The domain workers should use to connect to the Spacelift MQTT broker. For example mqtt.spacelift.example.com.
+  # The domain workers should use to connect to the Spacelift MQTT broker. For example `mqtt.spacelift.example.com`.
   mqtt_broker_domain = var.mqtt_broker_domain
 }
 ```
+
+> [!NOTE]
+> If `mqtt_broker_domain` is not specified, it defaults to the internal Kubernetes service DNS (`spacelift-mqtt.{namespace}.svc.cluster.local`), which is only reachable from within the cluster. External workers require a publicly accessible domain.
 
 ### Use an existing EKS cluster
 
@@ -86,22 +164,22 @@ See below for an example.
 
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v1.3.1"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted"
   # ...
 }
 
 module "iam" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v2.2.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam"
   # ...
 }
 
 module "kube_outputs" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v2.2.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs"
   # ...
 }
 ```
 
-See a full example in the [examples/byo_eks_cluster](examples/byo_eks_cluster) directory.
+See a full example in the [examples/byo-eks-cluster](examples/byo-eks-cluster) directory.
 
 ```hcl
 # Allow the cluster nodes to access the database.
@@ -124,6 +202,7 @@ locals {
   # The name of the EKS cluster that will be created. This needs to be defined up
   # front to allow the VPC subnets to be tagged correctly.
   cluster_name = "spacelift-cluster"
+  cluster_version = "1.34"
 }
 
 module "vpc" {
@@ -155,10 +234,9 @@ module "vpc" {
 }
 
 module "spacelift_eks" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
 
-  aws_region         = var.aws_region
-  server_domain      = var.server_domain
+  # other variables...
 
   create_vpc         = false
   vpc_id             = module.vpc.vpc_id
@@ -170,7 +248,9 @@ module "spacelift_eks" {
   # for an example of how these should be defined.
   rds_security_group_ids      = [aws_security_group.database_sg.id]
 
-  eks_cluster_name = local.cluster_name
+  eks_cluster_name    = local.cluster_name
+  eks_cluster_version = local.cluster_version
+  rds_engine_version  = "17.7"
 }
 ```
 
@@ -181,10 +261,9 @@ To use an existing KMS key, set `ebs_encryption.kms_key_arn`, if unset the modul
 
 ```hcl
 module "spacelift_eks" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v1.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
 
-  aws_region    = var.aws_region
-  server_domain = var.server_domain
+  # other variables...
 
   ebs_encryption = {
     enabled = true
