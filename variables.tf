@@ -167,7 +167,16 @@ variable "ecr_force_delete" {
 
 variable "eks_cluster_version" {
   type        = string
-  description = "The Kubernetes version to run on the cluster."
+  description = "The Kubernetes version to run on the cluster. If not specified, the latest available version at resource creation is used and no upgrades will occur except those automatically triggered by EKS."
+  default     = null
+}
+
+variable "eks_upgrade_policy" {
+  type = object({
+    support_type = string
+  })
+  description = "EKS cluster upgrade policy. support_type can be 'STANDARD' (14 months) or 'EXTENDED' (26 months). Extended support provides 12 additional months for planning upgrades but incurs additional costs. Clusters are automatically upgraded at the end of the support period."
+  default     = null
 }
 
 variable "k8s_namespace" {

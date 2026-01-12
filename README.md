@@ -104,17 +104,25 @@ provider "aws" {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.1.0"
 
   aws_region = var.aws_region
 
-  eks_cluster_version = "1.34" # Kubernetes version
+  eks_cluster_version = "1.34" # Optional: Kubernetes version. Omit to use latest available version.
   rds_engine_version  = "17.7" # Postgres version
+
+  # Optional: Set upgrade policy to STANDARD for more frequent upgrades and lower cost
+  eks_upgrade_policy = {
+    support_type = "STANDARD"
+  }
 
   # The domain you want to host Spacelift on, for example spacelift.example.com.
   server_domain = var.server_domain
 }
 ```
+
+> [!NOTE]
+> Clusters running on a Kubernetes version that has completed its lifecycle will be auto-upgraded to the next version. With extended support (26 months total), upgrades happen less frequently but incur additional costs. With standard support (14 months), upgrades happen more frequently, helping ensure you receive the latest bugfixes. This is why we recommend explicitly setting `eks_upgrade_policy` to `STANDARD` and omitting the `eks_cluster_version` variable to use the latest stable version available from AWS EKS. For more information, see the [EKS cluster upgrades best practices](https://docs.aws.amazon.com/eks/latest/best-practices/cluster-upgrades.html).
 
 The module creates:
 
