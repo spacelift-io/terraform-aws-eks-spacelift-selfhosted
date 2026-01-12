@@ -21,9 +21,10 @@ locals {
 }
 
 module "spacelift" {
-  source           = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v1.3.1"
-  region           = local.aws_region
-  website_endpoint = local.website_endpoint
+  source             = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.0.0"
+  region             = local.aws_region
+  website_endpoint   = local.website_endpoint
+  rds_engine_version = "17.7"
 }
 
 module "iam" {
