@@ -4,6 +4,7 @@ module "eks" {
 
   name               = local.cluster_name
   kubernetes_version = var.eks_cluster_version
+  upgrade_policy     = var.eks_upgrade_policy
 
   # The Kubernetes API endpoint will be accessible via the public internet.
   endpoint_public_access = true
