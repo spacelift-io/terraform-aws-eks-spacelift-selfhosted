@@ -23,3 +23,30 @@ spec:
     apiGroup: eks.amazonaws.com
     kind: IngressClassParams
     name: spacelift
+%{ if VCS_GATEWAY_ENABLED ~}
+---
+apiVersion: eks.amazonaws.com/v1
+kind: IngressClassParams
+metadata:
+  name: spacelift-vcs-gateway
+spec:
+  scheme: internet-facing
+  subnets:
+    ids:
+%{ for subnet_id in PUBLIC_SUBNET_IDS }
+      - "${subnet_id}"
+%{~ endfor }
+  certificateARNs:
+    - "${VCS_GATEWAY_ACM_ARN}"
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: spacelift-vcs-gateway
+spec:
+  controller: eks.amazonaws.com/alb
+  parameters:
+    apiGroup: eks.amazonaws.com
+    kind: IngressClassParams
+    name: spacelift-vcs-gateway
+%{ endif ~}

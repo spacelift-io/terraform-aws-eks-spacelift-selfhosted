@@ -103,6 +103,11 @@ variable "scheduler_service_account_name" {
   description = "The name of the Kubernetes service account used by the server."
 }
 
+variable "vcs_gateway_service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account used by the VCS gateway."
+}
+
 variable "create_sqs" {
   type        = bool
   description = "Whether to create the SQS queues for Spacelift."

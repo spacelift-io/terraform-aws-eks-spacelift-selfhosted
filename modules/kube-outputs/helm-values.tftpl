@@ -38,6 +38,29 @@ scheduler:
       # associated AWS IAM role.
       eks.amazonaws.com/role-arn: "${SCHEDULER_ROLE_ARN}"
 
+%{ if VCS_GATEWAY_ENABLED ~}
+vcsGateway:
+  enabled: true
+  domain: "${VCS_GATEWAY_DOMAIN}"
+  serviceAccount:
+    create: true
+    name: "${VCS_GATEWAY_SERVICE_ACCOUNT_NAME}"
+    annotations:
+      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
+      # associated AWS IAM role.
+      eks.amazonaws.com/role-arn: "${VCS_GATEWAY_ROLE_ARN}"
+  ingress:
+    enabled: true
+    ingressClassName: "spacelift-vcs-gateway"
+    annotations:
+      alb.ingress.kubernetes.io/backend-protocol-version: "GRPC"
+      alb.ingress.kubernetes.io/healthcheck-protocol: "HTTP"
+      alb.ingress.kubernetes.io/healthcheck-path: "/AWS.ALB/healthcheck"
+      alb.ingress.kubernetes.io/healthcheck-port: "traffic-port"
+      alb.ingress.kubernetes.io/success-codes: "12"
+      # The health check matches gRPC code 12 (unimplemented), which confirms the gRPC server is running
+%{ endif ~}
+
 ingress:
   enabled: true
   # We use the spacelift ingress class to automatically create an ALB and use the correct TLS
