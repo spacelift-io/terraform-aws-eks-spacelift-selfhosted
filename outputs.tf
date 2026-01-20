@@ -188,6 +188,11 @@ output "rds_password" {
   sensitive   = true
 }
 
+output "rds_engine_version_actual" {
+  description = "The running version of the RDS database engine. Will be null if create_database is false."
+  value       = var.create_database ? module.spacelift.rds_engine_version_actual : null
+}
+
 output "database_url" {
   description = "The URL to the write endpoint of the database. Can be used to pass to the DATABASE_URL environment variable for Spacelift. Only populated if create_database is true."
   value       = module.spacelift.database_url

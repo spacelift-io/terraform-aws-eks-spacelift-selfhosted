@@ -142,6 +142,9 @@ The module creates:
 - EKS cluster
   - A Kubernetes cluster to install Spacelift on.
 
+> [!TIP]
+> Planning a PostgreSQL upgrade? See the [RDS Upgrade Guide](https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted/blob/main/docs/rds-upgrade-guide.md) for minor and major version upgrade instructions.
+
 ## Module registries
 
 The module is also available [on the OpenTofu registry](https://search.opentofu.org/module/spacelift-io/eks-spacelift-selfhosted/aws/latest) where you can browse the input and output variables.
