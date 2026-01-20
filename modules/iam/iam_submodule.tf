@@ -9,7 +9,7 @@ module "iam_roles_and_policies" {
     server_service_account_name      = var.server_service_account_name
     drain_service_account_name       = var.drain_service_account_name
     scheduler_service_account_name   = var.scheduler_service_account_name
-    vcs_gateway_service_account_name = "unsupported-today-but-required-for-future-compatibility"
+    vcs_gateway_service_account_name = var.vcs_gateway_service_account_name
   }
 
   aws_partition = var.aws_partition

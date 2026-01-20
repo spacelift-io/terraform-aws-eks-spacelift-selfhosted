@@ -184,6 +184,29 @@ variable "scheduler_role_arn" {
   description = "The ARN of the IAM role to use for the scheduler service account."
 }
 
+variable "vcs_gateway_service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the VCS gateway."
+  default     = "spacelift-vcs-gateway"
+}
+
+variable "vcs_gateway_role_arn" {
+  type        = string
+  description = "The ARN of the IAM role to use for the VCS gateway service account."
+}
+
+variable "vcs_gateway_domain" {
+  type        = string
+  description = "The domain for the VCS Gateway external endpoint (e.g., vcs-gateway.example.com). Required when using remote VCS agents."
+  default     = null
+}
+
+variable "vcs_gateway_acm_arn" {
+  type        = string
+  description = "AWS Certificate Manager ARN for the VCS Gateway certificate."
+  default     = ""
+}
+
 variable "create_sqs" {
   type        = bool
   description = "Whether to create the SQS queues for Spacelift."

@@ -3,8 +3,10 @@ data "aws_caller_identity" "current" {}
 output "kubernetes_ingress_class" {
   description = "Generates an IngressClassParameters and IngressClass resource to configure the server load balancer. This output is just included as a convenience for use as part of the EKS getting started guide."
   value = templatefile("${path.module}/kubernetes-ingress-class.tftpl", {
-    PUBLIC_SUBNET_IDS = var.public_subnet_ids
-    SERVER_ACM_ARN    = var.server_acm_arn != null ? var.server_acm_arn : ""
+    PUBLIC_SUBNET_IDS   = var.public_subnet_ids
+    SERVER_ACM_ARN      = var.server_acm_arn != null ? var.server_acm_arn : ""
+    VCS_GATEWAY_ENABLED = var.vcs_gateway_domain != null && var.vcs_gateway_domain != ""
+    VCS_GATEWAY_ACM_ARN = var.vcs_gateway_acm_arn != null ? var.vcs_gateway_acm_arn : ""
   })
 }
 
@@ -50,6 +52,9 @@ output "kubernetes_secrets" {
     MESSAGE_QUEUE_SQS_EVENTS_INBOX_URL = local.events_inbox_queue_url
     MESSAGE_QUEUE_SQS_IOT_URL          = local.iot_queue_url
     MESSAGE_QUEUE_SQS_WEBHOOKS_URL     = local.webhooks_queue_url
+
+    VCS_GATEWAY_ENABLED = var.vcs_gateway_domain != null && var.vcs_gateway_domain != ""
+    VCS_GATEWAY_DOMAIN  = var.vcs_gateway_domain != null ? var.vcs_gateway_domain : ""
   })
 }
 
@@ -71,6 +76,13 @@ output "helm_values" {
     # Scheduler
     SCHEDULER_SERVICE_ACCOUNT_NAME = var.scheduler_service_account_name
     SCHEDULER_ROLE_ARN             = var.scheduler_role_arn
+
+    # VCS Gateway
+    VCS_GATEWAY_SERVICE_ACCOUNT_NAME = var.vcs_gateway_service_account_name
+    VCS_GATEWAY_ROLE_ARN             = var.vcs_gateway_role_arn
+    VCS_GATEWAY_ENABLED              = var.vcs_gateway_domain != null && var.vcs_gateway_domain != ""
+    VCS_GATEWAY_DOMAIN               = var.vcs_gateway_domain != null ? var.vcs_gateway_domain : ""
+    VCS_GATEWAY_ACM_ARN              = var.vcs_gateway_acm_arn != null ? var.vcs_gateway_acm_arn : ""
 
     # Ingress
     SERVER_ACM_ARN = var.server_acm_arn != null ? var.server_acm_arn : ""

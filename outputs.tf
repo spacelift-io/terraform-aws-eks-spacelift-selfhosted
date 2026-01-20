@@ -112,6 +112,16 @@ output "scheduler_role_arn" {
   description = "ARN of the IAM role for the Spacelift scheduler."
 }
 
+output "vcs_gateway_service_account_name" {
+  value       = var.vcs_gateway_service_account_name
+  description = "Name of the Kubernetes service account for the Spacelift VCS gateway."
+}
+
+output "vcs_gateway_role_arn" {
+  value       = module.iam.vcs_gateway_role_arn
+  description = "ARN of the IAM role for the Spacelift VCS gateway."
+}
+
 output "mqtt_broker_domain" {
   value       = coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
   description = "Domain name of the MQTT broker."

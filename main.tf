@@ -81,6 +81,7 @@ module "iam" {
   server_service_account_name          = var.server_service_account_name
   drain_service_account_name           = var.drain_service_account_name
   scheduler_service_account_name       = var.scheduler_service_account_name
+  vcs_gateway_service_account_name     = var.vcs_gateway_service_account_name
   create_sqs                           = var.create_sqs
   queue_arns                           = module.spacelift.sqs_queue_arns
 }
@@ -119,9 +120,13 @@ module "kube_outputs" {
   server_service_account_name          = var.server_service_account_name
   drain_service_account_name           = var.drain_service_account_name
   scheduler_service_account_name       = var.scheduler_service_account_name
+  vcs_gateway_service_account_name     = var.vcs_gateway_service_account_name
   server_role_arn                      = module.iam.server_role_arn
   drain_role_arn                       = module.iam.drain_role_arn
   scheduler_role_arn                   = module.iam.scheduler_role_arn
+  vcs_gateway_role_arn                 = module.iam.vcs_gateway_role_arn
+  vcs_gateway_domain                   = var.vcs_gateway_domain
+  vcs_gateway_acm_arn                  = var.vcs_gateway_acm_arn
   create_sqs                           = var.create_sqs
   queue_urls                           = module.spacelift.sqs_queue_urls
 }

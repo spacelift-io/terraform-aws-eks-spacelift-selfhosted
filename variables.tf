@@ -203,6 +203,12 @@ variable "scheduler_service_account_name" {
   default     = "spacelift-scheduler"
 }
 
+variable "vcs_gateway_service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the VCS gateway."
+  default     = "spacelift-vcs-gateway"
+}
+
 variable "eks_cluster_name" {
   description = "A custom name to use for the EKS cluster. By default one will be generated for you."
   default     = null
@@ -243,6 +249,18 @@ variable "admin_password" {
 variable "server_acm_arn" {
   type        = string
   description = "AWS Certificate Manager ARN for the server certificate. Only required for generating the helm_values output. It can be ignored if you are not using that output."
+  default     = ""
+}
+
+variable "vcs_gateway_domain" {
+  type        = string
+  description = "The domain for the VCS Gateway external endpoint (e.g., vcs-gateway.example.com). Required when using remote VCS agents."
+  default     = null
+}
+
+variable "vcs_gateway_acm_arn" {
+  type        = string
+  description = "AWS Certificate Manager ARN for the VCS Gateway certificate. Only required for generating the helm_values output. It can be ignored if you are not using that output."
   default     = ""
 }
 

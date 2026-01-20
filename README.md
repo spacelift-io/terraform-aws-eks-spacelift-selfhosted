@@ -164,6 +164,15 @@ module "spacelift" {
 > [!NOTE]
 > If `mqtt_broker_domain` is not specified, it defaults to the internal Kubernetes service DNS (`spacelift-mqtt.{namespace}.svc.cluster.local`), which is only reachable from within the cluster. External workers require a publicly accessible domain.
 
+### Enable VCS Gateway
+
+To enable the [VCS Gateway](https://docs.spacelift.io/concepts/vcs-agent-pools.html) for connecting remote VCS agents, provide the `vcs_gateway_domain` and `vcs_gateway_acm_arn` variables.
+
+> [!IMPORTANT]
+> The VCS Gateway requires its own ACM certificate, separate from the server certificate. This certificate must be valid for the VCS Gateway domain (e.g., `vcs-gateway.mycorp.io`), which is different from your main Spacelift server domain.
+
+See a full example in the [examples/with-vcs-gateway](examples/with-vcs-gateway) directory.
+
 ### Use an existing EKS cluster
 
 If you only want to deploy the Spacelift-specific infrastructure, and have an existing EKS cluster that you want to deploy Spacelift to, you may want to take a look at our [terraform-aws-spacelift-selfhosted](https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted) and [terraform-aws-iam-spacelift-selfhosted](https://github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted) modules.
