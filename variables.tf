@@ -124,6 +124,12 @@ variable "rds_backup_retention_period" {
   default     = 3
 }
 
+variable "rds_apply_immediately" {
+  type        = bool
+  description = "Whether to apply RDS changes immediately or during the next maintenance window."
+  default     = true
+}
+
 variable "server_domain" {
   type        = string
   description = "The domain that Spacelift is being hosted on, for example spacelift.example.com."
