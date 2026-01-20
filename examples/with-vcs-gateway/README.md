@@ -9,7 +9,7 @@ The VCS Gateway allows you to connect [remote VCS agents](https://docs.spacelift
 The VCS Gateway service exposes two listeners:
 
 - **gRPC (port 1984)** - External endpoint for [remote VCS Agents](https://docs.spacelift.io/concepts/vcs-agent-pools.html), exposed via an Application Load Balancer
-- **HTTP (port 1985)** - Internal endpoint for Spacelift services (server, drain), accessed via Kubernetes service discovery
+- **HTTP (port 1985)** - Internal endpoint for Spacelift services (server, drain), accessed via [pod IP addresses](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pods) within the EKS cluster
 
 ```mermaid
 architecture-beta
@@ -29,11 +29,11 @@ architecture-beta
     drain:B --> T:vcs_gateway
 ```
 
-| Connection                    | Protocol | Port | Path                                                             |
-| ----------------------------- | -------- | ---- | ---------------------------------------------------------------- |
-| VCS Agent → ALB → VCS Gateway | gRPC     | 1984 | `vcs-gateway.example.com:443` (TLS terminated at ALB)            |
-| Server → VCS Gateway          | HTTP     | 1985 | `http://spacelift-vcs-gateway:1985` (internal service discovery) |
-| Drain → VCS Gateway           | HTTP     | 1985 | `http://spacelift-vcs-gateway:1985` (internal service discovery) |
+| Connection                    | Protocol | Port | Path                                                  |
+| ----------------------------- | -------- | ---- | ----------------------------------------------------- |
+| VCS Agent → ALB → VCS Gateway | gRPC     | 1984 | `vcs-gateway.example.com:443` (TLS terminated at ALB) |
+| Server → VCS Gateway          | HTTP     | 1985 | `http://192.168.1.123:1985` (pod IP address)          |
+| Drain → VCS Gateway           | HTTP     | 1985 | `http://192.168.1.123:1985` (pod IP address)          |
 
 ## Prerequisites
 
@@ -46,9 +46,7 @@ architecture-beta
 module "spacelift_eks_selfhosted" {
   source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
 
-  aws_region         = "us-east-1"
-  server_domain      = "spacelift.example.com"
-  rds_engine_version = "16.1"
+  # Other variables...
 
   # VCS Gateway configuration
   vcs_gateway_domain  = "vcs-gateway.example.com"
@@ -58,9 +56,14 @@ module "spacelift_eks_selfhosted" {
 
 ## Inputs
 
-| Name                | Description                                                 | Type   | Required |
-| ------------------- | ----------------------------------------------------------- | ------ | -------- |
-| aws_region          | AWS region to deploy resources                              | string | yes      |
-| server_domain       | The domain that Spacelift is being hosted on                | string | yes      |
-| vcs_gateway_domain  | The domain for the VCS Gateway external endpoint            | string | yes      |
-| vcs_gateway_acm_arn | AWS Certificate Manager ARN for the VCS Gateway certificate | string | yes      |
+| Name                | Description                                                            | Type   | Required |
+| ------------------- | ---------------------------------------------------------------------- | ------ | -------- |
+| vcs_gateway_domain  | The domain for the VCS Gateway external endpoint, **without** protocol | string | yes      |
+| vcs_gateway_acm_arn | AWS Certificate Manager ARN for the VCS Gateway certificate            | string | yes      |
+
+## Next Steps
+
+After deploying the infrastructure:
+
+1. [Create a VCS Agent Pool](https://docs.spacelift.io/self-hosted/latest/concepts/vcs-agent-pools.html#create-the-vcs-agent-pool) in the Spacelift UI
+2. [Configure direct network access](https://docs.spacelift.io/self-hosted/latest/concepts/vcs-agent-pools.html#configure-direct-network-access) on your private workers using the `SPACELIFT_PRIVATEVCS_MAPPING_*` environment variables

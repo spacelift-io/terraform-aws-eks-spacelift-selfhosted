@@ -15,8 +15,6 @@ server:
     create: true
     name: "${SERVER_SERVICE_ACCOUNT_NAME}"
     annotations:
-      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
-      # associated AWS IAM role.
       eks.amazonaws.com/role-arn: "${SERVER_ROLE_ARN}"
 
 drain:
@@ -25,8 +23,6 @@ drain:
     create: true
     name: "${DRAIN_SERVICE_ACCOUNT_NAME}"
     annotations:
-      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
-      # associated AWS IAM role.
       eks.amazonaws.com/role-arn: "${DRAIN_ROLE_ARN}"
 
 scheduler:
@@ -34,8 +30,6 @@ scheduler:
     create: true
     name: "${SCHEDULER_SERVICE_ACCOUNT_NAME}"
     annotations:
-      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
-      # associated AWS IAM role.
       eks.amazonaws.com/role-arn: "${SCHEDULER_ROLE_ARN}"
 
 %{ if VCS_GATEWAY_ENABLED ~}
@@ -46,8 +40,6 @@ vcsGateway:
     create: true
     name: "${VCS_GATEWAY_SERVICE_ACCOUNT_NAME}"
     annotations:
-      # The following annotation is used to automatically connect the Kubernetes ServiceAccount to the
-      # associated AWS IAM role.
       eks.amazonaws.com/role-arn: "${VCS_GATEWAY_ROLE_ARN}"
   ingress:
     enabled: true
@@ -55,10 +47,9 @@ vcsGateway:
     annotations:
       alb.ingress.kubernetes.io/backend-protocol-version: "GRPC"
       alb.ingress.kubernetes.io/healthcheck-protocol: "HTTP"
-      alb.ingress.kubernetes.io/healthcheck-path: "/AWS.ALB/healthcheck"
+      alb.ingress.kubernetes.io/healthcheck-path: "/grpc.health.v1.Health/Check"
       alb.ingress.kubernetes.io/healthcheck-port: "traffic-port"
-      alb.ingress.kubernetes.io/success-codes: "12"
-      # The health check matches gRPC code 12 (unimplemented), which confirms the gRPC server is running
+      alb.ingress.kubernetes.io/success-codes: "0"
 %{ endif ~}
 
 ingress:
