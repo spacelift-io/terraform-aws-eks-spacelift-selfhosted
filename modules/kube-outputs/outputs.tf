@@ -18,8 +18,9 @@ output "kubernetes_secrets" {
     AWS_ACCOUNT_ID                                 = data.aws_caller_identity.current.account_id
     AWS_REGION                                     = var.aws_region
     SERVER_DOMAIN                                  = var.server_domain
-    MQTT_BROKER_DOMAIN                             = coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")
-    ENCRYPTION_TYPE                                = "kms"
+    MQTT_BROKER_TYPE                               = var.mqtt_broker_type
+    MQTT_BROKER_ENDPOINT                           = var.mqtt_broker_endpoint
+    ENCRYPTION_TYPE                                = var.encryption_type
     ENCRYPTION_KMS_ENCRYPTION_KEY_ID               = var.kms_encryption_key_arn
     ENCRYPTION_KMS_SIGNING_KEY_ID                  = var.kms_signing_key_arn
     OBJECT_STORAGE_BUCKET_DELIVERIES               = var.deliveries_bucket_name
@@ -43,7 +44,7 @@ output "kubernetes_secrets" {
     ADMIN_USERNAME                                 = var.admin_username != null ? var.admin_username : ""
     ADMIN_PASSWORD                                 = var.admin_password != null ? var.admin_password : ""
 
-    MESSAGE_QUEUE_TYPE                 = var.create_sqs ? "sqs" : "postgres"
+    MESSAGE_QUEUE_TYPE                 = local.use_sqs ? "sqs" : "postgres"
     MESSAGE_QUEUE_SQS_ASYNC_URL        = local.async_jobs_queue_url
     MESSAGE_QUEUE_SQS_ASYNC_FIFO_URL   = local.async_jobs_fifo_queue_url
     MESSAGE_QUEUE_SQS_CRONJOBS_URL     = local.cronjobs_queue_url
