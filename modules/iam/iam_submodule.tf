@@ -29,7 +29,9 @@ module "iam_roles_and_policies" {
   user_uploaded_workspaces_bucket_name = var.user_uploaded_workspaces_bucket_name
   workspace_bucket_name                = var.workspace_bucket_name
 
-  sqs_queues = var.create_sqs ? {
+  iot_topic = var.mqtt_broker_type == "iotcore" ? "arn:${var.aws_partition}:iot:*:${var.aws_account_id}:topic/spacelift/readonly/*" : null
+
+  sqs_queues = local.use_sqs ? {
     deadletter      = local.deadletter_queue_arn
     deadletter_fifo = local.deadletter_fifo_queue_arn
     async_jobs      = local.async_jobs_queue_arn

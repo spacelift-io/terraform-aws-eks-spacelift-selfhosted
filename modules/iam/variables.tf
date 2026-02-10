@@ -108,6 +108,12 @@ variable "vcs_gateway_service_account_name" {
   description = "The name of the Kubernetes service account used by the VCS gateway."
 }
 
+variable "mqtt_broker_type" {
+  type        = string
+  description = "The type of MQTT broker to use. Can be 'builtin' or 'iotcore'."
+  default     = "builtin"
+}
+
 variable "create_sqs" {
   type        = bool
   description = "Whether to create the SQS queues for Spacelift."
