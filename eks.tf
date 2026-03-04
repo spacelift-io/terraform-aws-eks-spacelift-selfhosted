@@ -18,9 +18,11 @@ module "eks" {
 
   # Enable EKS Auto mode using a general purpose node pool
   compute_config = {
-    enabled    = true
-    node_pools = ["general-purpose"]
+    enabled    = var.eks_auto_mode_enabled
+    node_pools = var.eks_auto_mode_enabled ? ["general-purpose"] : []
   }
+
+  eks_managed_node_groups = var.eks_auto_mode_enabled ? null : var.eks_managed_node_groups
 
   tags = {
     Name = "Spacelift cluster ${module.spacelift.unique_suffix}"
