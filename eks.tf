@@ -22,6 +22,25 @@ module "eks" {
     node_pools = var.eks_auto_mode_enabled ? ["general-purpose"] : []
   }
 
+  # When auto mode is disabled, the essential networking addons that auto mode
+  # normally manages must be installed BEFORE node groups via before_compute.
+  # Without this ordering, nodes deadlock: they need VPC CNI to pass health
+  # checks, but the default addon resource waits for node groups to complete.
+  addons = var.eks_auto_mode_enabled ? {} : {
+    vpc-cni = {
+      most_recent    = true
+      before_compute = true
+    }
+    kube-proxy = {
+      most_recent    = true
+      before_compute = true
+    }
+    coredns = {
+      most_recent    = true
+      before_compute = true
+    }
+  }
+
   eks_managed_node_groups = var.eks_auto_mode_enabled ? null : var.eks_managed_node_groups
 
   tags = {
