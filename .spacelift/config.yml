@@ -10,3 +10,7 @@ tests:
     project_root: examples/basic-example
     environment:
       TF_VAR_aws_region: "eu-west-2"
+  - name: Without auto mode
+    project_root: examples/without-auto-mode
+    environment:
+      TF_VAR_aws_region: "eu-west-2"
