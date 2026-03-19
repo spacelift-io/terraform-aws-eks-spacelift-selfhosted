@@ -1,3 +1,21 @@
+locals {
+  node_groups    = var.eks_auto_mode_enabled ? null : var.eks_managed_node_groups
+  inject_ebs_key = var.ebs_encryption.enabled && var.ebs_encryption.kms_key_arn == null
+  node_groups_with_defaults = local.inject_ebs_key && local.node_groups != null ? {
+    for name, ng in local.node_groups : name => merge(ng, ng.block_device_mappings != null ? {} : {
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            kms_key_id = aws_kms_key.ebs[0].arn
+            encrypted  = true
+          }
+        }
+      }
+    })
+  } : local.node_groups
+}
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
@@ -41,7 +59,7 @@ module "eks" {
     }
   }
 
-  eks_managed_node_groups = var.eks_auto_mode_enabled ? null : var.eks_managed_node_groups
+  eks_managed_node_groups = local.node_groups_with_defaults
 
   tags = {
     Name = "Spacelift cluster ${module.spacelift.unique_suffix}"

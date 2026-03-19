@@ -72,6 +72,47 @@ data "aws_iam_policy_document" "ebs_kms_key_policy" {
       values   = ["true"]
     }
   }
+
+  # Allow EKS managed nodes to use the key for EBS encryption operations
+  statement {
+    sid    = "Allow use of the key for EKS managed nodes"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+  }
+
+  # Allow the AutoScaling service-linked role to use the key and create grants.
+  # Required for managed node groups: the ASG service role must create a grant
+  # so EC2 can use the key to encrypt EBS volumes at launch time.
+  statement {
+    sid    = "Allow AutoScaling service-linked role"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"]
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_kms_key" "ebs" {
