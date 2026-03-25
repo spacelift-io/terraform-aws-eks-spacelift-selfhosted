@@ -104,11 +104,11 @@ provider "aws" {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.1.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.4.4"
 
   aws_region = var.aws_region
 
-  eks_cluster_version = "1.34" # Optional: Kubernetes version. Omit to use latest available version.
+  eks_cluster_version = "1.34" # Optional: Kubernetes version. Omit to use latest available version (recommended).
   rds_engine_version  = "17.7" # Postgres version
 
   # Optional: Set upgrade policy to STANDARD for more frequent upgrades and lower cost
