@@ -30,11 +30,13 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.1.1"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.2.0"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
   website_endpoint = "https://${var.server_domain}"
+
+  mqtt_broker_type = var.mqtt_broker_type
 
   kms_arn                       = var.kms_arn
   kms_master_key_multi_regional = var.kms_master_key_multi_regional
