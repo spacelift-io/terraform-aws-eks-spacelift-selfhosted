@@ -24,8 +24,8 @@ module "eks" {
   kubernetes_version = var.eks_cluster_version
   upgrade_policy     = var.eks_upgrade_policy
 
-  # The Kubernetes API endpoint will be accessible via the public internet.
-  endpoint_public_access = true
+  endpoint_public_access  = var.eks_endpoint_public_access
+  endpoint_private_access = var.eks_endpoint_private_access
 
   # Adds the current caller identity as an administrator via cluster access entry. This is required
   # in order to install the cluster addons.

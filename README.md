@@ -116,6 +116,10 @@ module "spacelift" {
     support_type = "STANDARD"
   }
 
+  # Optional: make the EKS API private-only.
+  eks_endpoint_public_access  = false
+  eks_endpoint_private_access = true
+
   # The domain you want to host Spacelift on, for example spacelift.example.com.
   server_domain = var.server_domain
 }

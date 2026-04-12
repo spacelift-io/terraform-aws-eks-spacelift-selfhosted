@@ -609,6 +609,18 @@ variable "eks_cluster_version" {
   default     = null
 }
 
+variable "eks_endpoint_public_access" {
+  type        = bool
+  description = "Whether the EKS Kubernetes API endpoint should be reachable over the public internet."
+  default     = true
+}
+
+variable "eks_endpoint_private_access" {
+  type        = bool
+  description = "Whether the EKS Kubernetes API endpoint should be reachable from within the VPC."
+  default     = true
+}
+
 variable "eks_upgrade_policy" {
   type = object({
     support_type = string
