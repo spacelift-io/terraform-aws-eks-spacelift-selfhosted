@@ -194,6 +194,16 @@ module "kube_outputs" {
   scheduler_role_arn               = module.iam.scheduler_role_arn
   vcs_gateway_role_arn             = module.iam.vcs_gateway_role_arn
 
+  # Drain concurrency
+  drain_concurrency_async_jobs      = var.drain_concurrency_async_jobs
+  drain_concurrency_async_jobs_fifo = var.drain_concurrency_async_jobs_fifo
+  drain_concurrency_cronjobs        = var.drain_concurrency_cronjobs
+  drain_concurrency_dlq             = var.drain_concurrency_dlq
+  drain_concurrency_dlq_fifo        = var.drain_concurrency_dlq_fifo
+  drain_concurrency_events          = var.drain_concurrency_events
+  drain_concurrency_iot             = var.drain_concurrency_iot
+  drain_concurrency_webhooks        = var.drain_concurrency_webhooks
+
   # VCS Gateway
   vcs_gateway_domain  = var.vcs_gateway_domain
   vcs_gateway_acm_arn = var.vcs_gateway_acm_arn
