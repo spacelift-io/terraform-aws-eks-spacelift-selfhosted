@@ -56,6 +56,15 @@ output "kubernetes_secrets" {
 
     VCS_GATEWAY_ENABLED = var.vcs_gateway_domain != null && var.vcs_gateway_domain != ""
     VCS_GATEWAY_DOMAIN  = var.vcs_gateway_domain != null ? var.vcs_gateway_domain : ""
+
+    DRAIN_CONCURRENCY_ASYNC_JOBS      = var.drain_concurrency_async_jobs
+    DRAIN_CONCURRENCY_ASYNC_JOBS_FIFO = var.drain_concurrency_async_jobs_fifo
+    DRAIN_CONCURRENCY_CRONJOBS        = var.drain_concurrency_cronjobs
+    DRAIN_CONCURRENCY_DLQ             = var.drain_concurrency_dlq
+    DRAIN_CONCURRENCY_DLQ_FIFO        = var.drain_concurrency_dlq_fifo
+    DRAIN_CONCURRENCY_EVENTS          = var.drain_concurrency_events
+    DRAIN_CONCURRENCY_IOT             = var.drain_concurrency_iot
+    DRAIN_CONCURRENCY_WEBHOOKS        = var.drain_concurrency_webhooks
   })
 }
 
