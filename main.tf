@@ -30,7 +30,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.2.0"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.3.0"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
@@ -77,6 +77,7 @@ module "spacelift" {
   rds_preferred_backup_window            = var.rds_preferred_backup_window
   rds_backup_retention_period            = var.rds_backup_retention_period
   rds_apply_immediately                  = var.rds_apply_immediately
+  rds_enable_http_endpoint               = var.rds_enable_http_endpoint
 
   s3_bucket_configuration          = var.s3_bucket_configuration
   s3_retain_on_destroy             = var.s3_retain_on_destroy
