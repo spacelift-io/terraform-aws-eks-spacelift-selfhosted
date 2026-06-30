@@ -204,6 +204,7 @@ module "kube_outputs" {
   drain_concurrency_events          = var.drain_concurrency_events
   drain_concurrency_iot             = var.drain_concurrency_iot
   drain_concurrency_webhooks        = var.drain_concurrency_webhooks
+  drain_scheduler_enabled           = var.drain_scheduler_enabled
 
   # VCS Gateway
   vcs_gateway_domain  = var.vcs_gateway_domain

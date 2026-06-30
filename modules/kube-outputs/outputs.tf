@@ -65,6 +65,8 @@ output "kubernetes_secrets" {
     DRAIN_CONCURRENCY_EVENTS          = var.drain_concurrency_events
     DRAIN_CONCURRENCY_IOT             = var.drain_concurrency_iot
     DRAIN_CONCURRENCY_WEBHOOKS        = var.drain_concurrency_webhooks
+
+    DRAIN_SCHEDULER_ENABLED = var.drain_scheduler_enabled
   })
 }
 
