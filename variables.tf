@@ -739,6 +739,12 @@ variable "drain_concurrency_webhooks" {
   default     = 1
 }
 
+variable "drain_scheduler_enabled" {
+  type        = bool
+  description = "When true, the drain also runs the cron scheduler. Leave false to keep using the standalone scheduler deployment."
+  default     = false
+}
+
 variable "scheduler_service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account to use for the scheduler."

@@ -199,6 +199,12 @@ variable "drain_concurrency_webhooks" {
   default     = 1
 }
 
+variable "drain_scheduler_enabled" {
+  type        = bool
+  description = "When true, the drain also runs the cron scheduler. Leave false to keep using the standalone scheduler deployment."
+  default     = false
+}
+
 variable "admin_username" {
   type        = string
   description = "The username for the Spacelift admin account. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
