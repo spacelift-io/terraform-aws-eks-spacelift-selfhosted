@@ -199,12 +199,6 @@ variable "drain_concurrency_webhooks" {
   default     = 1
 }
 
-variable "drain_scheduler_enabled" {
-  type        = bool
-  description = "When true, the drain also runs the cron scheduler. Leave false to keep using the standalone scheduler deployment."
-  default     = false
-}
-
 variable "admin_username" {
   type        = string
   description = "The username for the Spacelift admin account. Only required for generating the kubernetes_secrets output. It can be ignored if you are not using that output."
@@ -235,12 +229,6 @@ variable "drain_service_account_name" {
   default     = "spacelift-drain"
 }
 
-variable "scheduler_service_account_name" {
-  type        = string
-  description = "The name of the Kubernetes service account to use for the scheduler."
-  default     = "spacelift-scheduler"
-}
-
 variable "server_role_arn" {
   type        = string
   description = "The ARN of the IAM role to use for the server service account."
@@ -249,11 +237,6 @@ variable "server_role_arn" {
 variable "drain_role_arn" {
   type        = string
   description = "The ARN of the IAM role to use for the drain service account."
-}
-
-variable "scheduler_role_arn" {
-  type        = string
-  description = "The ARN of the IAM role to use for the scheduler service account."
 }
 
 variable "vcs_gateway_service_account_name" {
