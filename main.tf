@@ -127,7 +127,6 @@ module "iam" {
   namespace                        = var.k8s_namespace
   server_service_account_name      = var.server_service_account_name
   drain_service_account_name       = var.drain_service_account_name
-  scheduler_service_account_name   = var.scheduler_service_account_name
   vcs_gateway_service_account_name = var.vcs_gateway_service_account_name
 }
 
@@ -188,11 +187,9 @@ module "kube_outputs" {
   # Service accounts & IAM roles
   server_service_account_name      = var.server_service_account_name
   drain_service_account_name       = var.drain_service_account_name
-  scheduler_service_account_name   = var.scheduler_service_account_name
   vcs_gateway_service_account_name = var.vcs_gateway_service_account_name
   server_role_arn                  = module.iam.server_role_arn
   drain_role_arn                   = module.iam.drain_role_arn
-  scheduler_role_arn               = module.iam.scheduler_role_arn
   vcs_gateway_role_arn             = module.iam.vcs_gateway_role_arn
 
   # Drain concurrency
@@ -204,7 +201,6 @@ module "kube_outputs" {
   drain_concurrency_events          = var.drain_concurrency_events
   drain_concurrency_iot             = var.drain_concurrency_iot
   drain_concurrency_webhooks        = var.drain_concurrency_webhooks
-  drain_scheduler_enabled           = var.drain_scheduler_enabled
 
   # VCS Gateway
   vcs_gateway_domain  = var.vcs_gateway_domain

@@ -3,12 +3,14 @@ module "iam_roles_and_policies" {
 
   write_as_files = false
   kubernetes_role_assumption_config = {
-    aws_account_id                   = var.aws_account_id
-    oidc_provider                    = var.oidc_provider
-    namespace                        = var.namespace
-    server_service_account_name      = var.server_service_account_name
-    drain_service_account_name       = var.drain_service_account_name
-    scheduler_service_account_name   = var.scheduler_service_account_name
+    aws_account_id              = var.aws_account_id
+    oidc_provider               = var.oidc_provider
+    namespace                   = var.namespace
+    server_service_account_name = var.server_service_account_name
+    drain_service_account_name  = var.drain_service_account_name
+    # The scheduler role is no longer created (the cron scheduler runs inside
+    # the drain), but the pinned module version still requires the field.
+    scheduler_service_account_name   = "spacelift-scheduler"
     vcs_gateway_service_account_name = var.vcs_gateway_service_account_name
   }
 

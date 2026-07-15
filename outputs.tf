@@ -102,16 +102,6 @@ output "drain_service_account_name" {
   description = "Name of the Kubernetes service account for the Spacelift drain."
 }
 
-output "scheduler_service_account_name" {
-  value       = var.scheduler_service_account_name
-  description = "Name of the Kubernetes service account for the Spacelift scheduler."
-}
-
-output "scheduler_role_arn" {
-  value       = module.iam.scheduler_role_arn
-  description = "ARN of the IAM role for the Spacelift scheduler."
-}
-
 output "vcs_gateway_service_account_name" {
   value       = var.vcs_gateway_service_account_name
   description = "Name of the Kubernetes service account for the Spacelift VCS gateway."
