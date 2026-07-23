@@ -346,7 +346,7 @@ output "ebs_kms_key_arn" {
 }
 
 output "ebs_kms_key_id" {
-  value       = local.create_ebs_key ? aws_kms_key.ebs[0].key_id : null
+  value       = one(aws_kms_key.ebs[*].key_id)
   description = "ID of the KMS key used for EBS volume encryption. Only set when account_enforces_ebs_encryption is true."
 }
 
