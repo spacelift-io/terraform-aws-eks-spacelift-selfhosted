@@ -9,9 +9,6 @@
 > or newer**, the first release whose drain always runs the cron scheduler.
 > Nothing has to be configured for it - the generated `spacelift-drain` secret
 > carries no scheduler key at all.
->
-> Removed variables: `drain_scheduler_enabled`, `scheduler_service_account_name`.
-> Removed outputs: `scheduler_service_account_name`, `scheduler_role_arn`.
 
 > [!IMPORTANT]
 > ## 🔄 Upgrading to v3.0.0 - Breaking changes
