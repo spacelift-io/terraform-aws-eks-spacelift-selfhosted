@@ -28,6 +28,7 @@ output "kubernetes_secrets" {
     OBJECT_STORAGE_BUCKET_MODULES                  = var.modules_bucket_name
     OBJECT_STORAGE_BUCKET_POLICY_INPUTS            = var.policy_inputs_bucket_name
     OBJECT_STORAGE_BUCKET_RUN_LOGS                 = var.run_logs_bucket_name
+    OBJECT_STORAGE_BUCKET_RUN_OBSERVABILITY        = var.run_observability_bucket_name
     OBJECT_STORAGE_BUCKET_STATES                   = var.states_bucket_name
     OBJECT_STORAGE_BUCKET_USER_UPLOADED_WORKSPACES = var.user_uploaded_workspaces_bucket_name
     OBJECT_STORAGE_BUCKET_WORKSPACE                = var.workspace_bucket_name

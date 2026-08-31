@@ -30,7 +30,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.5.0"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.6.0"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
@@ -110,6 +110,7 @@ module "iam" {
   modules_bucket_name                  = module.spacelift.modules_bucket_name
   policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
   run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
+  run_observability_bucket_name        = module.spacelift.run_observability_bucket_name
   states_bucket_name                   = module.spacelift.states_bucket_name
   uploads_bucket_name                  = module.spacelift.uploads_bucket_name
   user_uploaded_workspaces_bucket_name = module.spacelift.user_uploaded_workspaces_bucket_name
@@ -155,6 +156,7 @@ module "kube_outputs" {
   modules_bucket_name                  = module.spacelift.modules_bucket_name
   policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
   run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
+  run_observability_bucket_name        = module.spacelift.run_observability_bucket_name
   states_bucket_name                   = module.spacelift.states_bucket_name
   user_uploaded_workspaces_bucket_name = module.spacelift.user_uploaded_workspaces_bucket_name
   workspace_bucket_name                = module.spacelift.workspace_bucket_name

@@ -266,6 +266,9 @@ variable "s3_bucket_configuration" {
     uploads      = object({ name = string, expiration_days = number })
     user_uploads = object({ name = string, expiration_days = number })
     workspace    = object({ name = string, expiration_days = number })
+
+    # Optional so that existing callers passing the full object keep working.
+    run_observability = optional(object({ name = string, expiration_days = number }))
   })
   description = "Custom configuration for S3 buckets. When null, bucket names are auto-generated."
   default     = null
