@@ -14,10 +14,9 @@ locals {
   oidc_provider    = try(aws_eks_cluster.this[0].identity[0].oidc[0].issuer, null)
   website_endpoint = "{your-server-domain}" # Example: spacelift.example.com
 
-  drain_service_account_name     = "spacelift-drain"
-  scheduler_service_account_name = "spacelift-scheduler"
-  server_service_account_name    = "spacelift-server"
-  namespace                      = "spacelift"
+  drain_service_account_name  = "spacelift-drain"
+  server_service_account_name = "spacelift-server"
+  namespace                   = "spacelift"
 }
 
 module "spacelift" {
@@ -44,7 +43,6 @@ module "iam" {
   oidc_provider                        = local.oidc_provider
   policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
   run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
-  scheduler_service_account_name       = local.scheduler_service_account_name
   server_service_account_name          = local.server_service_account_name
   states_bucket_name                   = module.spacelift.states_bucket_name
   unique_suffix                        = module.spacelift.unique_suffix
@@ -70,7 +68,6 @@ module "kube_outputs" {
   modules_bucket_name                  = module.spacelift.modules_bucket_name
   policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
   run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
-  scheduler_role_arn                   = module.iam.scheduler_role_arn
   server_domain                        = local.website_endpoint
   server_role_arn                      = module.iam.server_role_arn
   states_bucket_name                   = module.spacelift.states_bucket_name

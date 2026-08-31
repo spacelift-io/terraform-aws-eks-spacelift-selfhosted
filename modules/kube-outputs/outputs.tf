@@ -66,8 +66,6 @@ output "kubernetes_secrets" {
     DRAIN_CONCURRENCY_EVENTS          = var.drain_concurrency_events
     DRAIN_CONCURRENCY_IOT             = var.drain_concurrency_iot
     DRAIN_CONCURRENCY_WEBHOOKS        = var.drain_concurrency_webhooks
-
-    DRAIN_SCHEDULER_ENABLED = var.drain_scheduler_enabled
   })
 }
 
@@ -85,10 +83,6 @@ output "helm_values" {
     # Drain
     DRAIN_SERVICE_ACCOUNT_NAME = var.drain_service_account_name
     DRAIN_ROLE_ARN             = var.drain_role_arn
-
-    # Scheduler
-    SCHEDULER_SERVICE_ACCOUNT_NAME = var.scheduler_service_account_name
-    SCHEDULER_ROLE_ARN             = var.scheduler_role_arn
 
     # VCS Gateway
     VCS_GATEWAY_SERVICE_ACCOUNT_NAME = var.vcs_gateway_service_account_name

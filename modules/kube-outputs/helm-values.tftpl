@@ -25,13 +25,6 @@ drain:
     annotations:
       eks.amazonaws.com/role-arn: "${DRAIN_ROLE_ARN}"
 
-scheduler:
-  serviceAccount:
-    create: true
-    name: "${SCHEDULER_SERVICE_ACCOUNT_NAME}"
-    annotations:
-      eks.amazonaws.com/role-arn: "${SCHEDULER_ROLE_ARN}"
-
 %{ if VCS_GATEWAY_ENABLED ~}
 vcsGateway:
   enabled: true

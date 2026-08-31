@@ -1,6 +1,16 @@
 # ☁️ Terraform module for Spacelift on Elastic Kubernetes Service
 
 > [!IMPORTANT]
+> ## Upgrading to v4.0.0 - standalone scheduler removed
+>
+> The cron scheduler runs inside the drain: the module no longer creates the
+> scheduler IAM role/service-account wiring, and the `spacelift-self-hosted` Helm
+> chart no longer deploys the scheduler Deployment. **Requires Self-Hosted v6.4.0
+> or newer**, the first release whose drain always runs the cron scheduler.
+> Nothing has to be configured for it - the generated `spacelift-drain` secret
+> carries no scheduler key at all.
+
+> [!IMPORTANT]
 > ## 🔄 Upgrading to v3.0.0 - Breaking changes
 >
 > Click below to see the full upgrade guide with breaking changes.
@@ -267,7 +277,7 @@ module "spacelift_eks" {
   private_subnet_ids = module.vpc.private_subnets
   public_subnet_ids  = module.vpc.public_subnets
 
-  # When defining your own VPC, you need to provide the database, server, drain and scheduler
+  # When defining your own VPC, you need to provide the database, server and drain
   # security groups. Take a look at https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted/blob/main/modules/network/security_groups.tf
   # for an example of how these should be defined.
   rds_security_group_ids      = [aws_security_group.database_sg.id]
