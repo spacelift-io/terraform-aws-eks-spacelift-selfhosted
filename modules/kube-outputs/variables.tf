@@ -85,6 +85,11 @@ variable "run_logs_bucket_name" {
   description = "The name of the S3 bucket to use for run logs."
 }
 
+variable "run_observability_bucket_name" {
+  type        = string
+  description = "The name of the S3 bucket to use for run observability artifacts."
+}
+
 variable "states_bucket_name" {
   type        = string
   description = "The name of the S3 bucket to use for states."
