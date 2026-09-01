@@ -5,7 +5,6 @@ data "aws_region" "current" {}
 locals {
   aws_region     = data.aws_region.current.name
   aws_account_id = data.aws_caller_identity.current.account_id
-  aws_dns_suffix = data.aws_partition.current.dns_suffix
   aws_partition  = data.aws_partition.current.partition
 
   # Replace with your EKS cluster OIDC issuer URL
@@ -14,22 +13,22 @@ locals {
   oidc_provider    = try(aws_eks_cluster.this[0].identity[0].oidc[0].issuer, null)
   website_endpoint = "{your-server-domain}" # Example: spacelift.example.com
 
-  drain_service_account_name  = "spacelift-drain"
-  server_service_account_name = "spacelift-server"
-  namespace                   = "spacelift"
+  drain_service_account_name       = "spacelift-drain"
+  server_service_account_name      = "spacelift-server"
+  vcs_gateway_service_account_name = "spacelift-vcs-gateway"
+  namespace                        = "spacelift"
 }
 
 module "spacelift" {
-  source             = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.0.0"
+  source             = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v3.0.0"
   region             = local.aws_region
   website_endpoint   = local.website_endpoint
   rds_engine_version = "17.7"
 }
 
 module "iam" {
-  source                               = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v3.0.0"
+  source                               = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v4.0.0"
   aws_account_id                       = local.aws_account_id
-  aws_dns_suffix                       = local.aws_dns_suffix
   aws_partition                        = local.aws_partition
   deliveries_bucket_name               = module.spacelift.deliveries_bucket_name
   drain_service_account_name           = local.drain_service_account_name
@@ -43,16 +42,18 @@ module "iam" {
   oidc_provider                        = local.oidc_provider
   policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
   run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
+  run_observability_bucket_name        = module.spacelift.run_observability_bucket_name
   server_service_account_name          = local.server_service_account_name
   states_bucket_name                   = module.spacelift.states_bucket_name
   unique_suffix                        = module.spacelift.unique_suffix
   uploads_bucket_name                  = module.spacelift.uploads_bucket_name
   user_uploaded_workspaces_bucket_name = module.spacelift.user_uploaded_workspaces_bucket_name
+  vcs_gateway_service_account_name     = local.vcs_gateway_service_account_name
   workspace_bucket_name                = module.spacelift.workspace_bucket_name
 }
 
 module "kube_outputs" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v3.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v4.0.0"
 
   aws_region                           = local.aws_region
   database_read_only_url               = module.spacelift.database_read_only_url
@@ -68,12 +69,14 @@ module "kube_outputs" {
   modules_bucket_name                  = module.spacelift.modules_bucket_name
   policy_inputs_bucket_name            = module.spacelift.policy_inputs_bucket_name
   run_logs_bucket_name                 = module.spacelift.run_logs_bucket_name
+  run_observability_bucket_name        = module.spacelift.run_observability_bucket_name
   server_domain                        = local.website_endpoint
   server_role_arn                      = module.iam.server_role_arn
   states_bucket_name                   = module.spacelift.states_bucket_name
   uploads_bucket_name                  = module.spacelift.uploads_bucket_name
   uploads_bucket_url                   = module.spacelift.uploads_bucket_url
   user_uploaded_workspaces_bucket_name = module.spacelift.user_uploaded_workspaces_bucket_name
+  vcs_gateway_role_arn                 = module.iam.vcs_gateway_role_arn
   workspace_bucket_name                = module.spacelift.workspace_bucket_name
 }
 
