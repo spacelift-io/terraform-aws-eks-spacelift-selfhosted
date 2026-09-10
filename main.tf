@@ -30,7 +30,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v2.6.0"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v3.1.1"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
