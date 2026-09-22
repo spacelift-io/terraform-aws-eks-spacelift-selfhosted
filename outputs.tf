@@ -195,6 +195,16 @@ output "database_read_only_url" {
   sensitive   = true
 }
 
+output "database_iam_url" {
+  description = "The URL to the write endpoint of the database for the `rds_iam_auth.db_username` user. It carries no password: the services mint an IAM auth token instead. Only populated if create_database is true and rds_iam_auth is set."
+  value       = module.spacelift.database_iam_url
+}
+
+output "database_iam_read_only_url" {
+  description = "The URL to the read endpoint of the database for the `rds_iam_auth.db_username` user. It carries no password: the services mint an IAM auth token instead. Only populated if create_database is true and rds_iam_auth is set."
+  value       = module.spacelift.database_iam_read_only_url
+}
+
 output "ecr_backend_repository_url" {
   value       = module.spacelift.ecr_backend_repository_url
   description = "URL of the ECR repository for the backend images."

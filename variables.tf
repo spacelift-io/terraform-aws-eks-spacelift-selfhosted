@@ -792,3 +792,22 @@ variable "vcs_gateway_acm_arn" {
   description = "AWS Certificate Manager ARN for the VCS Gateway certificate. Only required for generating the kubernetes_secrets and helm_values outputs. It can be ignored if you are not using those outputs."
   default     = ""
 }
+
+variable "rds_iam_auth" {
+  type = object({
+    db_username         = string
+    cluster_resource_id = optional(string)
+  })
+  description = <<-EOT
+    Switches the services over to passwordless RDS authentication. Leave null to keep using a password.
+
+    What it sets up: `rds-db:connect` on `db_username` for the IRSA roles, the environment the services need
+    to use it, and a passwordless connection string for that user in the `kubernetes_secrets` output.
+
+    What you still have to do: create the user in Postgres and grant it `rds_iam` (see the README).
+    It must not be the master user - granting it `rds_iam` costs you password login, and with it break-glass access.
+
+    `cluster_resource_id` defaults to the cluster this module creates, and has to be set explicitly when `create_database` is false.
+  EOT
+  default     = null
+}

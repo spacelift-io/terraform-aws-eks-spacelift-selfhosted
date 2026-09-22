@@ -229,6 +229,40 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_database_ingress_rule" {
 }
 ```
 
+### RDS passwordless authentication (IAM auth)
+
+Set `rds_iam_auth` to give the server, drain and VCS gateway roles `rds-db:connect` on a database user, so they authenticate with short-lived IAM tokens instead of a password.
+
+With the database this module creates:
+
+```hcl
+  rds_iam_auth = {
+    db_username = "spacelift_iam"
+  }
+```
+
+That's the only thing you set. The IRSA roles get the permissions, and `kubernetes_secrets` carries a passwordless connection string for that user rather than the master one - apply that output to the cluster as usual, and the services pick it up on restart.
+
+With an external database (`create_database = false`), pass the cluster resource ID yourself:
+
+```hcl
+  rds_iam_auth = {
+    db_username         = "spacelift_iam"
+    cluster_resource_id = "cluster-ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  }
+```
+
+> [!IMPORTANT]
+> The database user is not created for you, and no user is a member of the built-in `rds_iam` role by default. Connected as the master user, run:
+>
+> ```sql
+> CREATE USER spacelift_iam;
+> GRANT rds_iam TO spacelift_iam;
+> GRANT spacelift TO spacelift_iam;
+> ```
+>
+> The last grant makes the IAM user a member of the `spacelift` role that owns the database, so it can alter the schema and not just read and write rows. Don't grant `rds_iam` to the master user itself - it loses password authentication, and with it your break-glass access.
+
 ### Deploy into an existing VPC
 
 ```hcl

@@ -125,3 +125,22 @@ variable "queue_arns" {
   default     = null
   description = "A map of SQS queue names to arns. Only required if create_sqs is false."
 }
+
+variable "rds_iam_auth" {
+  type = object({
+    region              = string
+    cluster_resource_id = string
+    db_usernames        = list(string)
+  })
+  description = "Grants the server and drain roles rds-db:connect on the given database users. Null keeps password authentication."
+  default     = null
+
+  validation {
+    condition = var.rds_iam_auth == null || (
+      try(var.rds_iam_auth.region, null) != null &&
+      try(var.rds_iam_auth.cluster_resource_id, null) != null &&
+      length(try(var.rds_iam_auth.db_usernames, [])) > 0
+    )
+    error_message = "rds_iam_auth needs a region, a cluster_resource_id and at least one entry in db_usernames. When create_database is false there is no cluster to read the ID from, so set rds_iam_auth.cluster_resource_id explicitly."
+  }
+}

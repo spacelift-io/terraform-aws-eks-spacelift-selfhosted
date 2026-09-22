@@ -37,6 +37,7 @@ output "kubernetes_secrets" {
     OBJECT_STORAGE_BUCKET_UPLOADS_URL              = var.uploads_bucket_url
     DATABASE_URL                                   = var.database_url
     DATABASE_READ_ONLY_URL                         = var.database_read_only_url
+    DATABASE_IAM_AUTH                              = var.database_iam_auth ? "true" : "false"
     LICENSE_TOKEN                                  = var.license_token != null ? var.license_token : ""
     SPACELIFT_PUBLIC_API                           = var.spacelift_public_api != null ? var.spacelift_public_api : ""
     WEBHOOKS_ENDPOINT                              = "https://${var.server_domain}/webhooks"
