@@ -23,6 +23,12 @@ locals {
     : "tls://${coalesce(var.mqtt_broker_domain, "spacelift-mqtt.${var.k8s_namespace}.svc.cluster.local")}:1984"
   )
 
+  rds_iam_auth = var.rds_iam_auth == null ? null : {
+    region              = var.aws_region
+    cluster_resource_id = try(coalesce(var.rds_iam_auth.cluster_resource_id, module.spacelift.rds_cluster_resource_id), null)
+    db_usernames        = [var.rds_iam_auth.db_username]
+  }
+
   sqs_queue_arns_from_override = var.sqs_queue_names_override != null ? {
     for k, v in var.sqs_queue_names_override :
     k => "arn:${data.aws_partition.current.partition}:sqs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${v}"
@@ -30,7 +36,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v3.1.1"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v3.2.0"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
@@ -73,6 +79,7 @@ module "spacelift" {
   rds_engine_version                     = var.rds_engine_version
   rds_engine_mode                        = var.rds_engine_mode
   rds_username                           = var.rds_username
+  rds_iam_username                       = try(var.rds_iam_auth.db_username, null)
   rds_instance_configuration             = var.rds_instance_configuration
   rds_preferred_backup_window            = var.rds_preferred_backup_window
   rds_backup_retention_period            = var.rds_backup_retention_period
@@ -123,6 +130,9 @@ module "iam" {
   create_sqs = var.create_sqs
   queue_arns = local.sqs_queue_arns_from_override != null ? local.sqs_queue_arns_from_override : module.spacelift.sqs_queue_arns
 
+  # Database
+  rds_iam_auth = local.rds_iam_auth
+
   # Service accounts & OIDC
   oidc_provider                    = module.eks.oidc_provider
   namespace                        = var.k8s_namespace
@@ -169,8 +179,9 @@ module "kube_outputs" {
   sqs_queue_urls_generated = module.spacelift.sqs_queue_urls
 
   # Database
-  database_url           = module.spacelift.database_url
-  database_read_only_url = module.spacelift.database_read_only_url
+  database_url           = var.rds_iam_auth != null ? module.spacelift.database_iam_url : module.spacelift.database_url
+  database_read_only_url = var.rds_iam_auth != null ? module.spacelift.database_iam_read_only_url : module.spacelift.database_read_only_url
+  database_iam_auth      = var.rds_iam_auth != null
 
   # ECR
   ecr_backend_repository_url  = module.spacelift.ecr_backend_repository_url

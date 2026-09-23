@@ -1,5 +1,5 @@
 module "iam_roles_and_policies" {
-  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.10.0"
+  source = "github.com/spacelift-io/terraform-aws-iam-spacelift-selfhosted?ref=v1.11.1"
 
   write_as_files = false
   kubernetes_role_assumption_config = {
@@ -31,6 +31,13 @@ module "iam_roles_and_policies" {
   uploads_bucket_name                  = var.uploads_bucket_name
   user_uploaded_workspaces_bucket_name = var.user_uploaded_workspaces_bucket_name
   workspace_bucket_name                = var.workspace_bucket_name
+
+  rds_iam_auth_config = var.rds_iam_auth == null ? null : {
+    aws_account_id      = var.aws_account_id
+    region              = var.rds_iam_auth.region
+    cluster_resource_id = var.rds_iam_auth.cluster_resource_id
+    db_usernames        = var.rds_iam_auth.db_usernames
+  }
 
   iot_topic = var.mqtt_broker_type == "iotcore" ? "arn:${var.aws_partition}:iot:*:${var.aws_account_id}:topic/spacelift/readonly/*" : null
 

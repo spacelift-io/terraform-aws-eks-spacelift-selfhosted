@@ -120,6 +120,12 @@ variable "uploads_bucket_url" {
   description = "The URL of the S3 bucket to use for uploads."
 }
 
+variable "database_iam_auth" {
+  type        = bool
+  description = "Whether the backend should authenticate to the database with AWS RDS IAM tokens instead of the password in the connection string."
+  default     = false
+}
+
 variable "database_url" {
   type        = string
   description = "The URL of the database to use for Spacelift. This is typically in the format 'postgresql://username:password@hostname:port/database'."

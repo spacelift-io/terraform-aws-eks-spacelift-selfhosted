@@ -27,7 +27,7 @@ module "spacelift" {
 }
 
 module "iam" {
-  source                               = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v4.0.0"
+  source                               = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam?ref=v4.1.0"
   aws_account_id                       = local.aws_account_id
   aws_partition                        = local.aws_partition
   deliveries_bucket_name               = module.spacelift.deliveries_bucket_name
@@ -53,7 +53,7 @@ module "iam" {
 }
 
 module "kube_outputs" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v4.0.0"
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs?ref=v4.1.0"
 
   aws_region                           = local.aws_region
   database_read_only_url               = module.spacelift.database_read_only_url
