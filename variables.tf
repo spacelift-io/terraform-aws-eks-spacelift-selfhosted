@@ -121,7 +121,6 @@ variable "security_group_names" {
     database    = string
     server      = string
     drain       = string
-    scheduler   = string
     vcs_gateway = string
   })
   description = "Custom names for the security groups to create."
@@ -329,6 +328,7 @@ variable "ecr_force_delete" {
 ### EKS
 
 variable "eks_cluster_name" {
+  type        = string
   description = "A custom name to use for the EKS cluster. By default one will be generated for you."
   default     = null
 }
