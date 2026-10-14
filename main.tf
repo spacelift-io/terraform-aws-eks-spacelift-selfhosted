@@ -85,6 +85,7 @@ module "spacelift" {
   rds_backup_retention_period            = var.rds_backup_retention_period
   rds_apply_immediately                  = var.rds_apply_immediately
   rds_enable_http_endpoint               = var.rds_enable_http_endpoint
+  rds_allow_auto_minor_version_upgrade   = var.rds_allow_auto_minor_version_upgrade
 
   s3_bucket_configuration          = var.s3_bucket_configuration
   s3_retain_on_destroy             = var.s3_retain_on_destroy
