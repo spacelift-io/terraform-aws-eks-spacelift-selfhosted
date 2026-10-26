@@ -90,7 +90,7 @@ To deploy this module, you'll need AWS credentials with the appropriate IAM perm
 - VPC and networking resources (subnets, route tables, security groups, NAT gateways, etc.)
 - RDS Aurora database management
 - S3 bucket management for storing Spacelift data
-- ECR repository management for container images
+- ECR repository management for container images (only needed with `create_container_registry = true`, the default)
 - KMS key management for encryption
 - IAM role and policy management
 - CloudWatch logs management
@@ -146,7 +146,7 @@ The module creates:
   - A VPC containing public and private subnets.
   - NAT and Internet Gateways, and appropriate routes.
   - Security group rules to allow communication between the Spacelift components.
-- Container registries
+- Container registries (unless `create_container_registry = false`)
   - A private ECR for storing the Spacelift backend image.
   - A private ECR for storing the Spacelift launcher image.
 - Database resources
@@ -189,6 +189,33 @@ To enable the [VCS Gateway](https://docs.spacelift.io/concepts/vcs-agent-pools.h
 > The VCS Gateway requires its own ACM certificate, separate from the server certificate. This certificate must be valid for the VCS Gateway domain (e.g., `vcs-gateway.mycorp.io`), which is different from your main Spacelift server domain.
 
 See a full example in the [examples/with-vcs-gateway](examples/with-vcs-gateway) directory.
+
+### Pull the images from another registry
+
+By default the module creates private ECR repositories, and you push the Spacelift images into them. To pull the images from another registry instead, for example `registry.spacelift.io`, turn the repositories off:
+
+```hcl
+module "spacelift" {
+  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
+
+  # other variables...
+
+  create_container_registry = false
+}
+```
+
+With `create_container_registry = false`:
+
+- the module creates no ECR repositories, and the `ecr_*` outputs are null;
+- the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE` or `LAUNCHER_IMAGE`;
+- the `helm_values` output has no `shared.image`, and the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`.
+
+Set the backend image, the launcher image and the pull secret (`shared.imagePullSecrets`) in your Helm values yourself.
+
+> [!WARNING]
+> Switching an existing installation from `true` to `false` destroys the ECR repositories. This fails while they still hold images, unless `ecr_force_delete = true`.
+
+The ECR permissions in [terraform-deployment-iam-policy.json](terraform-deployment-iam-policy.json) (the `ECRRepositoryManagement` statement) are not needed in this case.
 
 ### Use an existing EKS cluster
 

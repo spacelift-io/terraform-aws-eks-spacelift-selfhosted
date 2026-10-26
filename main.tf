@@ -36,7 +36,7 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=v3.3.0"
+  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=feat/er-10-create-container-registry"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
@@ -93,6 +93,7 @@ module "spacelift" {
 
   create_sqs = var.create_sqs
 
+  create_container_registry    = var.create_container_registry
   backend_ecr_repository_name  = var.backend_ecr_repository_name
   launcher_ecr_repository_name = var.launcher_ecr_repository_name
   number_of_images_to_retain   = var.number_of_images_to_retain
