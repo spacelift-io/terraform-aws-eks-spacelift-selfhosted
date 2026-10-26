@@ -14,3 +14,29 @@ tests:
     project_root: examples/without-auto-mode
     environment:
       TF_VAR_aws_region: "eu-west-2"
+  - name: Without ECR
+    project_root: examples/without-ecr
+    environment:
+      TF_VAR_aws_region: "eu-west-1"
+    after_apply:
+      # With create_container_registry = false the ECR outputs are null and no output
+      # carries an image setting. kubernetes_secrets holds secrets: only grep it and
+      # print key names, never values.
+      - |
+        set -e
+        TF_BIN=$(command -v tofu || command -v terraform)
+        for o in ecr_backend_repository_url ecr_launcher_repository_url; do
+          [ "$($TF_BIN output -json $o)" = "null" ] || { echo "FAIL: $o is not null"; exit 1; }
+        done
+        SHELL_OUT=$($TF_BIN output -raw shell)
+        HELM_VALUES=$($TF_BIN output -raw helm_values)
+        K8S_SECRETS=$($TF_BIN output -raw kubernetes_secrets)
+        echo "$HELM_VALUES"
+        echo "kubernetes_secrets keys:"; echo "$K8S_SECRETS" | grep -oE '^ +[A-Z_]+:' | tr -d ' :' | sort | tr '\n' ' '; echo
+        if echo "$SHELL_OUT" | grep -qE 'PRIVATE_ECR_LOGIN_URL|BACKEND_IMAGE|LAUNCHER_IMAGE'; then echo "FAIL: shell has image lines"; exit 1; fi
+        if echo "$HELM_VALUES" | grep -qE '^ *image:'; then echo "FAIL: helm_values has an image"; exit 1; fi
+        if echo "$K8S_SECRETS" | grep -qE 'LAUNCHER_IMAGE'; then echo "FAIL: kubernetes_secrets has LAUNCHER_IMAGE"; exit 1; fi
+        echo "$SHELL_OUT" | grep -q 'BINARIES_BUCKET_NAME=.' || { echo "FAIL: shell misses BINARIES_BUCKET_NAME"; exit 1; }
+        echo "$HELM_VALUES" | grep -q 'secretRef: "spacelift-shared"' || { echo "FAIL: helm_values misses shared.secretRef"; exit 1; }
+        echo "$K8S_SECRETS" | grep -qE '^  DATABASE_URL: ".+"' || { echo "FAIL: kubernetes_secrets misses DATABASE_URL"; exit 1; }
+        echo "OK: no ECR outputs, no image settings in shell, helm_values or kubernetes_secrets"
