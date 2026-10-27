@@ -212,10 +212,25 @@ With `create_container_registry = false`:
 
 Set the backend image, the launcher image and the pull secret (`shared.imagePullSecrets`) in your Helm values yourself.
 
-> [!WARNING]
-> Switching an existing installation from `true` to `false` destroys the ECR repositories. This fails while they still hold images, unless `ecr_force_delete = true`.
-
 The ECR permissions in [terraform-deployment-iam-policy.json](terraform-deployment-iam-policy.json) (the `ECRRepositoryManagement` statement) are not needed in this case.
+
+#### Switch an existing installation
+
+On an existing installation, turning the flag off removes the ECR repositories from the module. Follow [Switch an existing installation to another registry](https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted#switch-an-existing-installation-to-another-registry) in the AWS base module README, it explains how to keep the repositories or delete them. Two things are different on EKS:
+
+- point the services at the images in the new registry in your Helm values;
+- the repositories are one module level deeper, so the command to keep them is:
+
+  ```shell
+  tofu state rm 'module.spacelift.module.spacelift.module.ecr[0]'
+  ```
+
+  Replace the first `spacelift` with the name of your module block, and `tofu` with `terraform` if you use Terraform.
+
+If you delete the repositories with `ecr_force_delete`, keep the `ECRRepositoryManagement` statement until that apply is done.
+
+> [!WARNING]
+> If you set the flag to `false` without one of these steps, the apply fails with `RepositoryNotEmptyException`, and so does every apply after it.
 
 ### Use an existing EKS cluster
 

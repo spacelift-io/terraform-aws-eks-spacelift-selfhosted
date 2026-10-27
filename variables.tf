@@ -316,8 +316,8 @@ variable "create_container_registry" {
     With false, the ecr_* outputs are null, and the shell, helm_values and kubernetes_secrets outputs carry no image
     settings: set the backend image, the launcher image and imagePullSecrets in your Helm values yourself.
 
-    Switching an existing installation from true to false destroys the repositories. That fails while they still
-    hold images, unless ecr_force_delete is true.
+    On an existing installation, setting it to false removes the repositories from the module, see the README for
+    how to keep or delete them.
   EOT
   default     = true
 }
@@ -342,7 +342,7 @@ variable "number_of_images_to_retain" {
 
 variable "ecr_force_delete" {
   type        = bool
-  description = "Whether to force delete the ECRs, even if they contain images. Not used if create_container_registry is false."
+  description = "Whether to force delete the ECRs, even if they contain images. Not used if create_container_registry is false. To delete the repositories with their images when turning create_container_registry off, set it to true one apply before, see the README."
   default     = false
 }
 
