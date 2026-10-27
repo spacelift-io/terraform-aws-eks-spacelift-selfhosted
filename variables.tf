@@ -311,7 +311,7 @@ variable "create_container_registry" {
   type        = bool
   description = <<-EOT
     Whether to create the private ECR repositories for the backend and launcher images. Set it to false to pull the
-    images from another registry (for example registry.spacelift.io) instead.
+    images from another registry (for example oci.spacelift.io) instead.
 
     With false, the ecr_* outputs are null, and the shell, helm_values and kubernetes_secrets outputs carry no image
     settings: set the backend image, the launcher image and imagePullSecrets in your Helm values yourself.

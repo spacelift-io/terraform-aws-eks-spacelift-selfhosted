@@ -192,7 +192,7 @@ See a full example in the [examples/with-vcs-gateway](examples/with-vcs-gateway)
 
 ### Pull the images from another registry
 
-By default the module creates private ECR repositories, and you push the Spacelift images into them. To pull the images from another registry instead, for example `registry.spacelift.io`, turn the repositories off:
+By default the module creates private ECR repositories, and you push the Spacelift images into them. To pull the images from another registry instead, for example `oci.spacelift.io`, turn the repositories off:
 
 ```hcl
 module "spacelift" {
