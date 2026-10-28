@@ -44,7 +44,8 @@ architecture-beta
 
 ```hcl
 module "spacelift_eks_selfhosted" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 4.3"
 
   # Other variables...
 

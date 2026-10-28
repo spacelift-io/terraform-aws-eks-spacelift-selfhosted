@@ -33,7 +33,8 @@ Two previously optional parameters are now **required** and have no default valu
 
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.x.x"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 3.0"
 
   # New required parameters
   eks_cluster_version = "1.32"  # or your preferred Kubernetes version
@@ -48,7 +49,8 @@ module "spacelift" {
 **Before (v2.x.x):**
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v2.0.0"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "2.0.0"
 
   aws_region    = var.aws_region
   server_domain = var.server_domain
@@ -58,7 +60,8 @@ module "spacelift" {
 **After (v3.0.0):**
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.0.0"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "3.0.0"
 
   aws_region    = var.aws_region
   server_domain = var.server_domain
@@ -114,7 +117,8 @@ provider "aws" {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted?ref=v3.4.4"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 4.3"
 
   aws_region = var.aws_region
 
@@ -161,7 +165,7 @@ The module creates:
 
 ## Module registries
 
-The module is also available [on the OpenTofu registry](https://search.opentofu.org/module/spacelift-io/eks-spacelift-selfhosted/aws/latest) where you can browse the input and output variables.
+The module is published as `spacelift-io/eks-spacelift-selfhosted/aws` on both the [Terraform registry](https://registry.terraform.io/modules/spacelift-io/eks-spacelift-selfhosted/aws/latest) and the [OpenTofu registry](https://search.opentofu.org/module/spacelift-io/eks-spacelift-selfhosted/aws/latest), so the same `source` and `version` work with either tool. Both registries list the module's inputs and outputs.
 
 ## Examples
 
@@ -169,7 +173,8 @@ The module is also available [on the OpenTofu registry](https://search.opentofu.
 
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 4.3"
 
   # other variables...
 
@@ -198,17 +203,20 @@ See below for an example.
 
 ```hcl
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted"
+  source  = "spacelift-io/spacelift-selfhosted/aws"
+  version = "~> 3.3"
   # ...
 }
 
 module "iam" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/iam"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws//modules/iam"
+  version = "~> 4.3"
   # ...
 }
 
 module "kube_outputs" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted//modules/kube-outputs"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws//modules/kube-outputs"
+  version = "~> 4.3"
   # ...
 }
 ```
@@ -302,7 +310,8 @@ module "vpc" {
 }
 
 module "spacelift_eks" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 4.3"
 
   # other variables...
 
@@ -311,8 +320,8 @@ module "spacelift_eks" {
   private_subnet_ids = module.vpc.private_subnets
   public_subnet_ids  = module.vpc.public_subnets
 
-  # When defining your own VPC, you need to provide the database, server and drain
-  # security groups. Take a look at https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted/blob/main/modules/network/security_groups.tf
+  # When defining your own VPC, you need to provide the database security group.
+  # Take a look at https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted/blob/main/modules/network/security_groups.tf
   # for an example of how these should be defined.
   rds_security_group_ids      = [aws_security_group.database_sg.id]
 
@@ -329,7 +338,8 @@ To use an existing KMS key, set `ebs_encryption.kms_key_arn`, if unset the modul
 
 ```hcl
 module "spacelift_eks" {
-  source = "github.com/spacelift-io/terraform-aws-eks-spacelift-selfhosted"
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 4.3"
 
   # other variables...
 
