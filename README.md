@@ -192,6 +192,9 @@ See a full example in the [examples/with-vcs-gateway](examples/with-vcs-gateway)
 
 ### Pull the images from another registry
 
+> [!NOTE]
+> We recommend pulling the images from `oci.spacelift.io`. Starting with Self-Hosted v8.0.0, releases no longer include the image archives, so the images are only available from `oci.spacelift.io`. To keep them in your own registry, mirror them from there.
+
 By default the module creates private ECR repositories, and you push the Spacelift images into them. To pull the images from another registry instead, for example `oci.spacelift.io`, turn the repositories off:
 
 ```hcl
