@@ -28,7 +28,7 @@ locals {
   aws_region       = "us-west-2"                    # Your AWS region
   aws_account_id   = "123456789012"                 # Your AWS account ID
   aws_partition    = "aws"                          # Your AWS partition
-  oidc_provider    = "https://oidc.eks.us-west-2.amazonaws.com/id/ABCD1234"  # Your EKS OIDC provider URL
+  oidc_provider    = "oidc.eks.us-west-2.amazonaws.com/id/ABCD1234"  # Your EKS OIDC issuer URL, without https://
   website_endpoint = "spacelift.example.com"        # Your Spacelift domain
 }
 ```

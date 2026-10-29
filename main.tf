@@ -36,7 +36,8 @@ locals {
 }
 
 module "spacelift" {
-  source = "github.com/spacelift-io/terraform-aws-spacelift-selfhosted?ref=feat/er-10-create-container-registry"
+  source  = "spacelift-io/spacelift-selfhosted/aws"
+  version = "3.4.0"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
