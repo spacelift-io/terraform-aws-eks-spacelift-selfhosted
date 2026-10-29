@@ -41,7 +41,7 @@ output "kubernetes_secrets" {
     LICENSE_TOKEN                                  = var.license_token != null ? var.license_token : ""
     SPACELIFT_PUBLIC_API                           = var.spacelift_public_api != null ? var.spacelift_public_api : ""
     WEBHOOKS_ENDPOINT                              = "https://${var.server_domain}/webhooks"
-    LAUNCHER_IMAGE                                 = var.ecr_launcher_repository_url
+    LAUNCHER_IMAGE                                 = var.ecr_launcher_repository_url != null ? var.ecr_launcher_repository_url : ""
     SPACELIFT_VERSION                              = var.spacelift_version != null ? var.spacelift_version : ""
     ADMIN_USERNAME                                 = var.admin_username != null ? var.admin_username : ""
     ADMIN_PASSWORD                                 = var.admin_password != null ? var.admin_password : ""
@@ -74,7 +74,7 @@ output "helm_values" {
   description = "Generates a Helm values.yaml file that can be used when deploying Spacelift. This output is just included as a convenience for use as part of the EKS getting started guide."
   value = templatefile("${path.module}/helm-values.tftpl", {
     SERVER_DOMAIN     = var.server_domain
-    BACKEND_IMAGE     = var.ecr_backend_repository_url
+    BACKEND_IMAGE     = var.ecr_backend_repository_url != null ? var.ecr_backend_repository_url : ""
     SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
 
     # Server

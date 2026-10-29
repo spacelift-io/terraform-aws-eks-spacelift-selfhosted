@@ -153,7 +153,8 @@ variable "spacelift_public_api" {
 
 variable "ecr_launcher_repository_url" {
   type        = string
-  description = "The URL of the ECR repository for the Spacelift launcher image."
+  description = "The repository URL of the Spacelift launcher image, without a tag. If null, the kubernetes_secrets output leaves out LAUNCHER_IMAGE and LAUNCHER_IMAGE_TAG, and you set the launcher image in your Helm values instead."
+  default     = null
 }
 
 variable "spacelift_version" {
@@ -225,7 +226,8 @@ variable "admin_password" {
 
 variable "ecr_backend_repository_url" {
   type        = string
-  description = "The URL of the ECR repository for the Spacelift backend image."
+  description = "The repository URL of the Spacelift backend image, without a tag. If null, the helm_values output leaves out shared.image, and you set the backend image in your Helm values instead."
+  default     = null
 }
 
 variable "server_service_account_name" {

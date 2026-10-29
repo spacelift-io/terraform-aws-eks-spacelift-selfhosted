@@ -93,7 +93,7 @@ To deploy this module, you'll need AWS credentials with the appropriate IAM perm
 - VPC and networking resources (subnets, route tables, security groups, NAT gateways, etc.)
 - RDS Aurora database management
 - S3 bucket management for storing Spacelift data
-- ECR repository management for container images
+- ECR repository management for container images (only needed with `create_container_registry = true`, the default)
 - KMS key management for encryption
 - IAM role and policy management
 - CloudWatch logs management
@@ -150,7 +150,7 @@ The module creates:
   - A VPC containing public and private subnets.
   - NAT and Internet Gateways, and appropriate routes.
   - Security group rules to allow communication between the Spacelift components.
-- Container registries
+- Container registries (unless `create_container_registry = false`)
   - A private ECR for storing the Spacelift backend image.
   - A private ECR for storing the Spacelift launcher image.
 - Database resources
@@ -194,6 +194,52 @@ To enable the [VCS Gateway](https://docs.spacelift.io/concepts/vcs-agent-pools.h
 > The VCS Gateway requires its own ACM certificate, separate from the server certificate. This certificate must be valid for the VCS Gateway domain (e.g., `vcs-gateway.mycorp.io`), which is different from your main Spacelift server domain.
 
 See a full example in the [examples/with-vcs-gateway](examples/with-vcs-gateway) directory.
+
+### Pull the images from another registry
+
+> [!NOTE]
+> We recommend pulling the images from `oci.spacelift.io`. Starting with Self-Hosted v8.0.0, releases no longer include the image archives, so the images are only available from `oci.spacelift.io`. To keep them in your own registry, mirror them from there.
+
+By default the module creates private ECR repositories, and you push the Spacelift images into them. To pull the images from another registry instead, for example `oci.spacelift.io`, turn the repositories off:
+
+```hcl
+module "spacelift" {
+  source  = "spacelift-io/eks-spacelift-selfhosted/aws"
+  version = "~> 4.4"
+
+  # other variables...
+
+  create_container_registry = false
+}
+```
+
+With `create_container_registry = false`:
+
+- the module creates no ECR repositories, and the `ecr_*` outputs are null;
+- the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE` or `LAUNCHER_IMAGE`;
+- the `helm_values` output has no `shared.image`, and the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`.
+
+Set the backend image, the launcher image and the pull secret (`shared.imagePullSecrets`) in your Helm values yourself.
+
+The ECR permissions in [terraform-deployment-iam-policy.json](terraform-deployment-iam-policy.json) (the `ECRRepositoryManagement` statement) are not needed in this case.
+
+#### Switch an existing installation
+
+On an existing installation, turning the flag off removes the ECR repositories from the module. Follow [Switch an existing installation to another registry](https://github.com/spacelift-io/terraform-aws-spacelift-selfhosted#switch-an-existing-installation-to-another-registry) in the AWS base module README, it explains how to keep the repositories or delete them. Two things are different on EKS:
+
+- point the services at the images in the new registry in your Helm values;
+- the repositories are one module level deeper, so the command to keep them is:
+
+  ```shell
+  tofu state rm 'module.spacelift.module.spacelift.module.ecr[0]'
+  ```
+
+  Replace the first `spacelift` with the name of your module block, and `tofu` with `terraform` if you use Terraform.
+
+If you delete the repositories with `ecr_force_delete`, keep the `ECRRepositoryManagement` statement until that apply is done.
+
+> [!WARNING]
+> If you set the flag to `false` without one of these steps, the apply fails with `RepositoryNotEmptyException`, and so does every apply after it.
 
 ### Use an existing EKS cluster
 

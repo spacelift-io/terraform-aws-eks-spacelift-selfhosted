@@ -1,6 +1,8 @@
 shared:
   serverHostname: "${SERVER_DOMAIN}"
+%{ if BACKEND_IMAGE != "" ~}
   image: "${BACKEND_IMAGE}:${SPACELIFT_VERSION}"
+%{ endif ~}
   secretRef: "spacelift-shared"
 
 serviceAccount:
