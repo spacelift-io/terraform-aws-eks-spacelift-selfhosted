@@ -644,6 +644,31 @@ variable "eks_upgrade_policy" {
   default     = null
 }
 
+variable "eks_enable_cluster_creator_admin_permissions" {
+  type        = bool
+  description = "Whether to give cluster admin, through an access entry, to the identity that plans this module. Disable it when plan and apply run as different identities, or when different people run the module, and list the admins in eks_access_entries. With it disabled and no entries, nobody has Kubernetes access until an access entry is added."
+  default     = true
+}
+
+variable "eks_access_entries" {
+  type = map(object({
+    kubernetes_groups = optional(list(string))
+    principal_arn     = string
+    type              = optional(string, "STANDARD")
+    user_name         = optional(string)
+    tags              = optional(map(string), {})
+    policy_associations = optional(map(object({
+      policy_arn = string
+      access_scope = object({
+        namespaces = optional(list(string))
+        type       = string
+      })
+    })), {})
+  }))
+  description = "Access entries to add to the EKS cluster, passed to the access_entries input of terraform-aws-modules/eks/aws."
+  default     = {}
+}
+
 variable "ebs_encryption" {
   type = object({
     enabled : bool,
