@@ -210,8 +210,20 @@ variable "rds_subnet_group_name" {
 
 variable "rds_password_sm_arn" {
   type        = string
-  description = "ARN of the Secrets Manager secret storing the DB cluster password. Only used when importing an existing database."
+  description = "ARN of the Secrets Manager secret storing the DB cluster password. Used when importing an existing database, and required for a global secondary (rds_is_global_secondary): the primary's database secret. A name instead of an ARN is read in this module's region, e.g. a replica of the primary's secret."
   default     = null
+}
+
+variable "rds_global_cluster_identifier" {
+  type        = string
+  description = "The identifier of an aws_rds_global_cluster to join the Spacelift database to, as the primary cluster unless rds_is_global_secondary is true. Only taken into account when the cluster is created."
+  default     = null
+}
+
+variable "rds_is_global_secondary" {
+  type        = bool
+  description = "Whether the Spacelift database joins rds_global_cluster_identifier as a secondary cluster. It then inherits the database and master credentials from the primary, so rds_password_sm_arn must point at the primary's database secret (its database_secret_arn output)."
+  default     = false
 }
 
 variable "rds_security_group_ids" {
