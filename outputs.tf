@@ -157,6 +157,16 @@ output "vpc_id" {
   description = "ID of the VPC. It will be null if create_vpc is false."
 }
 
+output "rds_cluster_identifier" {
+  description = "Identifier of the RDS cluster. Will be null if create_database is false."
+  value       = module.spacelift.rds_cluster_identifier
+}
+
+output "rds_cluster_arn" {
+  description = "ARN of the RDS cluster. Will be null if create_database is false."
+  value       = module.spacelift.rds_cluster_arn
+}
+
 output "rds_cluster_endpoint" {
   description = "Endpoint of the RDS cluster. Will be null if create_database is false."
   value       = var.create_database ? module.spacelift.rds_cluster_endpoint : null
@@ -203,6 +213,11 @@ output "database_iam_url" {
 output "database_iam_read_only_url" {
   description = "The URL to the read endpoint of the database for the `rds_iam_auth.db_username` user. It carries no password: the services mint an IAM auth token instead. Only populated if create_database is true and rds_iam_auth is set."
   value       = module.spacelift.database_iam_read_only_url
+}
+
+output "database_secret_arn" {
+  description = "ARN of the Secrets Manager secret holding the database connection strings. Will be null if create_database is false."
+  value       = module.spacelift.database_secret_arn
 }
 
 output "ecr_backend_repository_url" {

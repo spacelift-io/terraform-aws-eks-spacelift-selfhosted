@@ -76,6 +76,8 @@ module "spacelift" {
   rds_parameter_group_description        = var.rds_parameter_group_description
   rds_subnet_group_name                  = var.rds_subnet_group_name
   rds_password_sm_arn                    = var.rds_password_sm_arn
+  rds_global_cluster_identifier          = var.rds_global_cluster_identifier
+  rds_is_global_secondary                = var.rds_is_global_secondary
   rds_delete_protection_enabled          = var.rds_delete_protection_enabled
   rds_engine_version                     = var.rds_engine_version
   rds_engine_mode                        = var.rds_engine_mode
