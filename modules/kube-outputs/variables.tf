@@ -230,6 +230,18 @@ variable "ecr_backend_repository_url" {
   default     = null
 }
 
+variable "image_pull_secret_name" {
+  type        = string
+  description = "Name of the Kubernetes secret with your credentials for oci.spacelift.io. Only used when ecr_backend_repository_url is null: the helm_values output then pulls the images from oci.spacelift.io with this secret. You create the secret yourself, in the namespace you install Spacelift to."
+  default     = "spacelift-registry"
+  nullable    = false
+
+  validation {
+    condition     = length(var.image_pull_secret_name) > 0
+    error_message = "image_pull_secret_name must not be empty."
+  }
+}
+
 variable "server_service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account to use for the server."

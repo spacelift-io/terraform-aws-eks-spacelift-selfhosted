@@ -2,6 +2,14 @@ shared:
   serverHostname: "${SERVER_DOMAIN}"
 %{ if BACKEND_IMAGE != "" ~}
   image: "${BACKEND_IMAGE}:${SPACELIFT_VERSION}"
+%{ else ~}
+  imagePullSecrets:
+    - name: "${IMAGE_PULL_SECRET_NAME}"
+  backendImage:
+    tag: "${SPACELIFT_VERSION}"
+  launcherImage:
+    enabled: true
+    tag: "${SPACELIFT_VERSION}"
 %{ endif ~}
   secretRef: "spacelift-shared"
 

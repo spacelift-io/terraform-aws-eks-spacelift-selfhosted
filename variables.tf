@@ -313,13 +313,25 @@ variable "create_container_registry" {
     Whether to create the private ECR repositories for the backend and launcher images. Set it to false to pull the
     images from another registry (for example oci.spacelift.io) instead.
 
-    With false, the ecr_* outputs are null, and the shell, helm_values and kubernetes_secrets outputs carry no image
-    settings: set the backend image, the launcher image and imagePullSecrets in your Helm values yourself.
+    With false, the ecr_* outputs are null, the shell and kubernetes_secrets outputs carry no image settings, and the
+    helm_values output pulls the images from oci.spacelift.io with the pull secret named in image_pull_secret_name.
 
     On an existing installation, setting it to false removes the repositories from the module, see the README for
     how to keep or delete them.
   EOT
   default     = true
+}
+
+variable "image_pull_secret_name" {
+  type        = string
+  description = "Name of the Kubernetes secret with your credentials for oci.spacelift.io. Only used when create_container_registry is false: the helm_values output then pulls the images from oci.spacelift.io with this secret. You create the secret yourself, in the namespace you install Spacelift to."
+  default     = "spacelift-registry"
+  nullable    = false
+
+  validation {
+    condition     = length(var.image_pull_secret_name) > 0
+    error_message = "image_pull_secret_name must not be empty."
+  }
 }
 
 variable "backend_ecr_repository_name" {

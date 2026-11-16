@@ -189,6 +189,7 @@ module "kube_outputs" {
   # ECR
   ecr_backend_repository_url  = module.spacelift.ecr_backend_repository_url
   ecr_launcher_repository_url = module.spacelift.ecr_launcher_repository_url
+  image_pull_secret_name      = var.image_pull_secret_name
 
   # Spacelift
   spacelift_version    = var.spacelift_version

@@ -217,9 +217,20 @@ With `create_container_registry = false`:
 
 - the module creates no ECR repositories, and the `ecr_*` outputs are null;
 - the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE` or `LAUNCHER_IMAGE`;
-- the `helm_values` output has no `shared.image`, and the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`.
+- the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`;
+- the `helm_values` output has no `shared.image`. Instead it pulls the backend and launcher images from `oci.spacelift.io` (`shared.backendImage` and `shared.launcherImage`, tagged with `spacelift_version`) with the pull secret named in `image_pull_secret_name` (`spacelift-registry` by default). These keys need Helm chart 7.1.0 or newer.
 
-Set the backend image, the launcher image and the pull secret (`shared.imagePullSecrets`) in your Helm values yourself.
+Create the pull secret in the namespace you install Spacelift to, with the registry credentials that come with your license:
+
+```shell
+kubectl create secret docker-registry spacelift-registry \
+  --namespace spacelift \
+  --docker-server=oci.spacelift.io \
+  --docker-username=<registry username> \
+  --docker-password=<registry password>
+```
+
+To pull from another registry, override `shared.backendImage` and `shared.launcherImage` in your Helm values.
 
 The ECR permissions in [terraform-deployment-iam-policy.json](terraform-deployment-iam-policy.json) (the `ECRRepositoryManagement` statement) are not needed in this case.
 
