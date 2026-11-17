@@ -1,15 +1,16 @@
 shared:
   serverHostname: "${SERVER_DOMAIN}"
-%{ if BACKEND_IMAGE != "" ~}
-  image: "${BACKEND_IMAGE}:${SPACELIFT_VERSION}"
-%{ else ~}
+%{ if USE_SPACELIFT_REGISTRY ~}
   imagePullSecrets:
-    - name: "${IMAGE_PULL_SECRET_NAME}"
-  backendImage:
-    tag: "${SPACELIFT_VERSION}"
+    - name: "${SPACELIFT_REGISTRY_PULL_SECRET_NAME}"
   launcherImage:
     enabled: true
-    tag: "${SPACELIFT_VERSION}"
+%{ else ~}
+%{ if BACKEND_IMAGE != null ~}
+  image: "${BACKEND_IMAGE}:${SPACELIFT_VERSION}"
+%{ else ~}
+  # No image source is configured: set shared.backendImage and shared.launcherImage (or shared.image) yourself.
+%{ endif ~}
 %{ endif ~}
   secretRef: "spacelift-shared"
 

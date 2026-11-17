@@ -209,7 +209,8 @@ module "spacelift" {
 
   # other variables...
 
-  create_container_registry = false
+  create_container_registry           = false
+  spacelift_registry_pull_secret_name = "spacelift-registry"
 }
 ```
 
@@ -218,9 +219,11 @@ With `create_container_registry = false`:
 - the module creates no ECR repositories, and the `ecr_*` outputs are null;
 - the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE` or `LAUNCHER_IMAGE`;
 - the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`;
-- the `helm_values` output has no `shared.image`. Instead it pulls the backend and launcher images from `oci.spacelift.io` (`shared.backendImage` and `shared.launcherImage`, tagged with `spacelift_version`) with the pull secret named in `image_pull_secret_name` (`spacelift-registry` by default). These keys need Helm chart 7.1.0 or newer.
+- the `helm_values` output has no `shared.image` from ECR.
 
-Create the pull secret in the namespace you install Spacelift to, with the registry credentials that come with your license:
+Set `spacelift_registry_pull_secret_name` to pull the backend and launcher images from `oci.spacelift.io`. The `helm_values` output then references that pull secret (`shared.imagePullSecrets`) and enables the launcher image (`shared.launcherImage.enabled`). It sets no image tag, so the images follow the version of the Helm chart. These keys need Helm chart 7.1.0 or newer. The variable doesn't depend on `create_container_registry`, but you usually set both together.
+
+Create the pull secret yourself, in the namespace you install Spacelift to, with the registry credentials that come with your license. The module never sees the credentials, it only puts the secret name in `helm_values`:
 
 ```shell
 kubectl create secret docker-registry spacelift-registry \
@@ -230,7 +233,7 @@ kubectl create secret docker-registry spacelift-registry \
   --docker-password=<registry password>
 ```
 
-To pull from another registry, override `shared.backendImage` and `shared.launcherImage` in your Helm values.
+With `create_container_registry = false` and no `spacelift_registry_pull_secret_name`, `helm_values` sets no image. To pull from another registry, for example your own mirror, set `shared.backendImage` and `shared.launcherImage` in your Helm values.
 
 The ECR permissions in [terraform-deployment-iam-policy.json](terraform-deployment-iam-policy.json) (the `ECRRepositoryManagement` statement) are not needed in this case.
 
