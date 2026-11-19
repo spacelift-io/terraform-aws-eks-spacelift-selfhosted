@@ -27,9 +27,8 @@ module "eks" {
   endpoint_public_access  = var.eks_endpoint_public_access
   endpoint_private_access = var.eks_endpoint_private_access
 
-  # Adds the current caller identity as an administrator via cluster access entry. This is required
-  # in order to install the cluster addons.
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = var.eks_enable_cluster_creator_admin_permissions
+  access_entries                           = var.eks_access_entries
 
   vpc_id     = local.vpc_id
   subnet_ids = local.private_subnet_ids
