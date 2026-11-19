@@ -1,6 +1,17 @@
 shared:
   serverHostname: "${SERVER_DOMAIN}"
+%{ if USE_SPACELIFT_REGISTRY ~}
+  imagePullSecrets:
+    - name: "${SPACELIFT_REGISTRY_PULL_SECRET_NAME}"
+  launcherImage:
+    enabled: true
+%{ else ~}
+%{ if BACKEND_IMAGE != null ~}
   image: "${BACKEND_IMAGE}:${SPACELIFT_VERSION}"
+%{ else ~}
+  # No image source is configured: set shared.backendImage and shared.launcherImage (or shared.image) yourself.
+%{ endif ~}
+%{ endif ~}
   secretRef: "spacelift-shared"
 
 serviceAccount:

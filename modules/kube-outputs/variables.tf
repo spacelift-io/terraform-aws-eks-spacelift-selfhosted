@@ -153,7 +153,8 @@ variable "spacelift_public_api" {
 
 variable "ecr_launcher_repository_url" {
   type        = string
-  description = "The URL of the ECR repository for the Spacelift launcher image."
+  description = "The repository URL of the Spacelift launcher image, without a tag. If null, the kubernetes_secrets output leaves out LAUNCHER_IMAGE and LAUNCHER_IMAGE_TAG, and you set the launcher image in your Helm values instead."
+  default     = null
 }
 
 variable "spacelift_version" {
@@ -225,7 +226,19 @@ variable "admin_password" {
 
 variable "ecr_backend_repository_url" {
   type        = string
-  description = "The URL of the ECR repository for the Spacelift backend image."
+  description = "The repository URL of the Spacelift backend image, without a tag. If null, the helm_values output leaves out shared.image: it then pulls the images from oci.spacelift.io when spacelift_registry_pull_secret_name is set, otherwise you set the images in your Helm values yourself."
+  default     = null
+}
+
+variable "spacelift_registry_pull_secret_name" {
+  type        = string
+  description = "Name of the Kubernetes secret holding your credentials for oci.spacelift.io. Set this to pull both the backend and launcher images from the Spacelift registry: the helm_values output then references this secret and enables the chart's launcher image, and no longer sets an image from the module's ECR repositories. You create the secret yourself, in the namespace you install Spacelift to. Launcher pull credentials for worker pools are not covered by this secret, set them on the worker pool controller as well."
+  default     = null
+
+  validation {
+    condition     = var.spacelift_registry_pull_secret_name != ""
+    error_message = "spacelift_registry_pull_secret_name must not be empty."
+  }
 }
 
 variable "server_service_account_name" {

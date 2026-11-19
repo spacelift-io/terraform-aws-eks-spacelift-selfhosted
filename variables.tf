@@ -307,27 +307,53 @@ variable "sqs_queue_names_override" {
 
 ### ECR
 
+variable "create_container_registry" {
+  type        = bool
+  description = <<-EOT
+    Whether to create the private ECR repositories for the backend and launcher images. Set it to false to pull the
+    images from another registry (for example oci.spacelift.io) instead.
+
+    With false, the ecr_* outputs are null, and the shell, kubernetes_secrets and helm_values outputs carry no ECR
+    image settings. To pull the images from oci.spacelift.io, set spacelift_registry_pull_secret_name as well.
+
+    On an existing installation, setting it to false removes the repositories from the module, see the README for
+    how to keep or delete them.
+  EOT
+  default     = true
+}
+
+variable "spacelift_registry_pull_secret_name" {
+  type        = string
+  description = "Name of the Kubernetes secret holding your credentials for oci.spacelift.io. Set this to pull both the backend and launcher images from the Spacelift registry: the helm_values output then references this secret and enables the chart's launcher image, and no longer sets an image from the module's ECR repositories. You create the secret yourself, in the namespace you install Spacelift to. Launcher pull credentials for worker pools are not covered by this secret, set them on the worker pool controller as well."
+  default     = null
+
+  validation {
+    condition     = var.spacelift_registry_pull_secret_name != ""
+    error_message = "spacelift_registry_pull_secret_name must not be empty."
+  }
+}
+
 variable "backend_ecr_repository_name" {
   type        = string
-  description = "Name of the backend ECR repository."
+  description = "Name of the backend ECR repository. Not used if create_container_registry is false."
   default     = null
 }
 
 variable "launcher_ecr_repository_name" {
   type        = string
-  description = "Name of the launcher ECR repository."
+  description = "Name of the launcher ECR repository. Not used if create_container_registry is false."
   default     = null
 }
 
 variable "number_of_images_to_retain" {
   type        = number
-  description = "Number of Docker images to retain in ECR repositories. Default is 5. If set to 0, no images will be cleaned up."
+  description = "Number of Docker images to retain in ECR repositories. Default is 5. If set to 0, no images will be cleaned up. Not used if create_container_registry is false."
   default     = 5
 }
 
 variable "ecr_force_delete" {
   type        = bool
-  description = "Whether to force delete the ECRs, even if they contain images."
+  description = "Whether to force delete the ECRs, even if they contain images. Not used if create_container_registry is false. To delete the repositories with their images when turning create_container_registry off, set it to true one apply before, see the README."
   default     = false
 }
 

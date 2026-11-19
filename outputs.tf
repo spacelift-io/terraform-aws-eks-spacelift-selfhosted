@@ -2,22 +2,27 @@ output "shell" {
   sensitive   = true
   description = "Environment variables for installation tasks. This output is just included as a convenience for use as part of the EKS getting started guide."
   value = templatefile("${path.module}/env.tftpl", {
-    env : {
-      AWS_ACCOUNT_ID    = data.aws_caller_identity.current.account_id
-      AWS_REGION        = var.aws_region
-      SERVER_DOMAIN     = var.server_domain
-      SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
+    env : merge(
+      {
+        AWS_ACCOUNT_ID    = data.aws_caller_identity.current.account_id
+        AWS_REGION        = var.aws_region
+        SERVER_DOMAIN     = var.server_domain
+        SPACELIFT_VERSION = var.spacelift_version != null ? var.spacelift_version : ""
 
-      # Artifacts
-      PRIVATE_ECR_LOGIN_URL = split("/", module.spacelift.ecr_backend_repository_url)[0]
-      BACKEND_IMAGE         = module.spacelift.ecr_backend_repository_url
-      LAUNCHER_IMAGE        = module.spacelift.ecr_launcher_repository_url
-      BINARIES_BUCKET_NAME  = module.spacelift.binaries_bucket_name
+        # Artifacts
+        BINARIES_BUCKET_NAME = module.spacelift.binaries_bucket_name
 
-      # EKS
-      EKS_CLUSTER_NAME = local.cluster_name
-      K8S_NAMESPACE    = var.k8s_namespace
-    },
+        # EKS
+        EKS_CLUSTER_NAME = local.cluster_name
+        K8S_NAMESPACE    = var.k8s_namespace
+      },
+      # Without a container registry the images come from elsewhere, so there is nothing to log in or push to.
+      var.create_container_registry ? {
+        PRIVATE_ECR_LOGIN_URL = split("/", module.spacelift.ecr_backend_repository_url)[0]
+        BACKEND_IMAGE         = module.spacelift.ecr_backend_repository_url
+        LAUNCHER_IMAGE        = module.spacelift.ecr_launcher_repository_url
+      } : {},
+    ),
   })
 }
 
@@ -207,22 +212,22 @@ output "database_iam_read_only_url" {
 
 output "ecr_backend_repository_url" {
   value       = module.spacelift.ecr_backend_repository_url
-  description = "URL of the ECR repository for the backend images."
+  description = "URL of the ECR repository for the backend images. Will be null if create_container_registry is false."
 }
 
 output "ecr_backend_repository_arn" {
   value       = module.spacelift.ecr_backend_repository_arn
-  description = "ARN of the ECR repository for the backend images."
+  description = "ARN of the ECR repository for the backend images. Will be null if create_container_registry is false."
 }
 
 output "ecr_launcher_repository_url" {
   value       = module.spacelift.ecr_launcher_repository_url
-  description = "URL of the ECR repository for the launcher images."
+  description = "URL of the ECR repository for the launcher images. Will be null if create_container_registry is false."
 }
 
 output "ecr_launcher_repository_arn" {
   value       = module.spacelift.ecr_launcher_repository_arn
-  description = "ARN of the ECR repository for the launcher images."
+  description = "ARN of the ECR repository for the launcher images. Will be null if create_container_registry is false."
 }
 
 output "binaries_bucket_arn" {
