@@ -169,6 +169,19 @@ The module is published as `spacelift-io/eks-spacelift-selfhosted/aws` on both t
 
 ## Examples
 
+### Deploy Spacelift Flows
+
+To deploy [Spacelift Flows](https://docs.spacelift.io/flows/introduction) next to Spacelift, set the `flows` variable with its `domain`, `acm_arn`, `organization_name`, `admin_email` and `admin_password`. Your license has to include Flows.
+
+Flows runs in the same cluster and namespace as Spacelift, and uses the same database cluster. The module adds a bucket with a KMS key of its own and an IAM role for it, and puts Flows into the `kubernetes_secrets`, `kubernetes_ingress_class` and `helm_values` outputs. Flows creates its own database on the cluster the first time it starts.
+
+The Flows image follows the same rule as the backend image. With the default `create_container_registry = true`, the module creates ECR repositories for the Flows backend, agent and Kubernetes JS executor images, and `helm_values` points Flows at the backend one, so push the images there. With `spacelift_registry_pull_secret_name` set, Flows pulls from `oci.spacelift.io` with that secret.
+
+> [!IMPORTANT]
+> Flows requires its own ACM certificate, separate from the server certificate. It must be valid for the Flows domain (e.g., `flows.mycorp.io`) and for `*.endpoints.flows.mycorp.io`, `oauth.flows.mycorp.io` and `mcp.flows.mycorp.io`. If you set `expose_gateway`, add `gateway.flows.mycorp.io` too.
+
+See a full example in the [examples/with-flows](examples/with-flows) directory.
+
 ### External workers
 
 ```hcl
@@ -217,7 +230,7 @@ module "spacelift" {
 With `create_container_registry = false`:
 
 - the module creates no ECR repositories, and the `ecr_*` outputs are null;
-- the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE` or `LAUNCHER_IMAGE`;
+- the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE`, `LAUNCHER_IMAGE` or `FLOWS_*_IMAGE`;
 - the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`;
 - the `helm_values` output has no `shared.image` from ECR.
 

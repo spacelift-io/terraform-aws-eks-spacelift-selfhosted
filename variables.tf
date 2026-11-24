@@ -260,20 +260,19 @@ variable "rds_enable_http_endpoint" {
 
 variable "s3_bucket_configuration" {
   type = object({
-    binaries     = object({ name = string, expiration_days = number })
-    deliveries   = object({ name = string, expiration_days = number })
-    large_queue  = object({ name = string, expiration_days = number })
-    metadata     = object({ name = string, expiration_days = number })
-    modules      = object({ name = string, expiration_days = number })
-    policy       = object({ name = string, expiration_days = number })
-    run_logs     = object({ name = string, expiration_days = number })
-    states       = object({ name = string, expiration_days = number })
-    uploads      = object({ name = string, expiration_days = number })
-    user_uploads = object({ name = string, expiration_days = number })
-    workspace    = object({ name = string, expiration_days = number })
-
-    # Optional so that existing callers passing the full object keep working.
+    binaries          = object({ name = string, expiration_days = number })
+    deliveries        = object({ name = string, expiration_days = number })
+    flows             = optional(object({ name = string }))
+    large_queue       = object({ name = string, expiration_days = number })
+    metadata          = object({ name = string, expiration_days = number })
+    modules           = object({ name = string, expiration_days = number })
+    policy            = object({ name = string, expiration_days = number })
+    run_logs          = object({ name = string, expiration_days = number })
     run_observability = optional(object({ name = string, expiration_days = number }))
+    states            = object({ name = string, expiration_days = number })
+    uploads           = object({ name = string, expiration_days = number })
+    user_uploads      = object({ name = string, expiration_days = number })
+    workspace         = object({ name = string, expiration_days = number })
   })
   description = "Custom configuration for S3 buckets. When null, bucket names are auto-generated."
   default     = null
@@ -848,6 +847,39 @@ variable "vcs_gateway_acm_arn" {
   type        = string
   description = "AWS Certificate Manager ARN for the VCS Gateway certificate. Only required for generating the kubernetes_secrets and helm_values outputs. It can be ignored if you are not using those outputs."
   default     = ""
+}
+
+### Spacelift Flows
+
+variable "flows" {
+  type = object({
+    domain               = string
+    acm_arn              = string
+    organization_name    = string
+    admin_email          = string
+    admin_password       = string
+    database_url         = optional(string)
+    expose_gateway       = optional(bool, false)
+    service_account_name = optional(string, "spacelift-flows")
+  })
+  description = <<-EOT
+    Deploys Spacelift Flows next to Spacelift. Leave null to not deploy it.
+
+    When set, the module creates the Flows bucket, its KMS key and the IAM role, and adds Flows to the `kubernetes_secrets`,
+    `kubernetes_ingress_class` and `helm_values` outputs.
+
+    - `domain`: the domain Flows is served on, without protocol and port (e.g., flows.example.com).
+    - `acm_arn`: AWS Certificate Manager ARN for the Flows certificate. It has to cover `domain` and its
+      `*.endpoints`, `oauth` and `mcp` subdomains, plus `gateway` when `expose_gateway` is true.
+    - `organization_name`: the name of the organization Flows creates on its first start. It's a display name
+      (e.g., "My Corp"), and shows up in places like invitation emails.
+    - `admin_email`: the email of the admin user Flows creates on its first start.
+    - `admin_password`: the password that admin user logs in with.
+    - `database_url`: the connection string of the Flows database. Set it when `create_database` is false.
+    - `expose_gateway`: whether to route `gateway.<domain>` to the Flows gateway, for agents that run outside the cluster.
+    - `service_account_name`: the name of the Kubernetes service account used by Flows. Defaults to spacelift-flows.
+  EOT
+  default     = null
 }
 
 variable "rds_iam_auth" {

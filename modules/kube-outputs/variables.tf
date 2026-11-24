@@ -303,3 +303,29 @@ variable "sqs_queue_names_override" {
   description = "Map of user-provided SQS queue names for externally-managed queues. Takes priority over sqs_queue_urls_generated."
   default     = null
 }
+
+variable "flows" {
+  type = object({
+    domain               = string
+    acm_arn              = string
+    expose_gateway       = bool
+    service_account_name = string
+    role_arn             = string
+    bucket_name          = string
+    ecr_repository_url   = string
+    organization_name    = string
+    admin_email          = string
+    agent_pool_id        = string
+  })
+  description = "Spacelift Flows settings. Null when Flows is not deployed, and then the outputs contain nothing about Flows."
+}
+
+variable "flows_secrets" {
+  type = object({
+    database_url     = string
+    admin_password   = string
+    agent_pool_token = string
+  })
+  description = "The sensitive part of the Spacelift Flows settings. Null when Flows is not deployed."
+  sensitive   = true
+}

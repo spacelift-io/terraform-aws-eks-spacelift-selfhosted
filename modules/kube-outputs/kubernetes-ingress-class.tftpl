@@ -50,3 +50,30 @@ spec:
     kind: IngressClassParams
     name: spacelift-vcs-gateway
 %{ endif ~}
+%{ if FLOWS_ENABLED ~}
+---
+apiVersion: eks.amazonaws.com/v1
+kind: IngressClassParams
+metadata:
+  name: spacelift-flows
+spec:
+  scheme: internet-facing
+  subnets:
+    ids:
+%{ for subnet_id in PUBLIC_SUBNET_IDS }
+      - "${subnet_id}"
+%{~ endfor }
+  certificateARNs:
+    - "${FLOWS_ACM_ARN}"
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: spacelift-flows
+spec:
+  controller: eks.amazonaws.com/alb
+  parameters:
+    apiGroup: eks.amazonaws.com
+    kind: IngressClassParams
+    name: spacelift-flows
+%{ endif ~}

@@ -7,13 +7,15 @@ output "kubernetes_ingress_class" {
     SERVER_ACM_ARN      = var.server_acm_arn != null ? var.server_acm_arn : ""
     VCS_GATEWAY_ENABLED = var.vcs_gateway_domain != null && var.vcs_gateway_domain != ""
     VCS_GATEWAY_ACM_ARN = var.vcs_gateway_acm_arn != null ? var.vcs_gateway_acm_arn : ""
+    FLOWS_ENABLED       = local.flows_enabled
+    FLOWS_ACM_ARN       = local.flows_enabled ? var.flows.acm_arn : ""
   })
 }
 
 output "kubernetes_secrets" {
   sensitive   = true
   description = "Kubernetes secrets required for the Spacelift services. This output is just included as a convenience for use as part of the EKS getting started guide."
-  value = templatefile("${path.module}/kubernetes-secrets.tftpl", {
+  value = join("", [templatefile("${path.module}/kubernetes-secrets.tftpl", {
     namespace                                      = var.k8s_namespace
     AWS_ACCOUNT_ID                                 = data.aws_caller_identity.current.account_id
     AWS_REGION                                     = var.aws_region
@@ -59,6 +61,9 @@ output "kubernetes_secrets" {
     VCS_GATEWAY_ENABLED = var.vcs_gateway_domain != null && var.vcs_gateway_domain != ""
     VCS_GATEWAY_DOMAIN  = var.vcs_gateway_domain != null ? var.vcs_gateway_domain : ""
 
+    FLOWS_ENABLED = local.flows_enabled
+    FLOWS_CONFIG  = local.flows_config
+
     DRAIN_CONCURRENCY_ASYNC_JOBS      = var.drain_concurrency_async_jobs
     DRAIN_CONCURRENCY_ASYNC_JOBS_FIFO = var.drain_concurrency_async_jobs_fifo
     DRAIN_CONCURRENCY_CRONJOBS        = var.drain_concurrency_cronjobs
@@ -67,7 +72,7 @@ output "kubernetes_secrets" {
     DRAIN_CONCURRENCY_EVENTS          = var.drain_concurrency_events
     DRAIN_CONCURRENCY_IOT             = var.drain_concurrency_iot
     DRAIN_CONCURRENCY_WEBHOOKS        = var.drain_concurrency_webhooks
-  })
+  }), local.flows_secret])
 }
 
 output "helm_values" {
@@ -99,5 +104,14 @@ output "helm_values" {
 
     # MQTT
     EXTERNAL_WORKERS_ENABLED = var.mqtt_broker_domain != null && var.mqtt_broker_domain != ""
+
+    # Flows
+    FLOWS_ENABLED              = local.flows_enabled
+    FLOWS_DOMAIN               = local.flows_enabled ? var.flows.domain : ""
+    FLOWS_SERVICE_ACCOUNT_NAME = local.flows_enabled ? var.flows.service_account_name : ""
+    FLOWS_ROLE_ARN             = local.flows_enabled ? var.flows.role_arn : ""
+    FLOWS_EXPOSE_GATEWAY       = local.flows_enabled ? var.flows.expose_gateway : false
+    FLOWS_IMAGE_REGISTRY       = local.flows_image_registry
+    FLOWS_IMAGE_REPOSITORY     = local.flows_image_repository
   })
 }

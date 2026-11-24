@@ -37,7 +37,7 @@ locals {
 
 module "spacelift" {
   source  = "spacelift-io/spacelift-selfhosted/aws"
-  version = "3.4.0"
+  version = "3.5.1"
 
   unique_suffix    = local.unique_suffix
   region           = var.aws_region
@@ -89,6 +89,7 @@ module "spacelift" {
   rds_allow_auto_minor_version_upgrade   = var.rds_allow_auto_minor_version_upgrade
 
   s3_bucket_configuration          = var.s3_bucket_configuration
+  enable_flows                     = local.flows_enabled
   s3_retain_on_destroy             = var.s3_retain_on_destroy
   enable_public_access_block_on_s3 = var.enable_public_access_block_on_s3
 
@@ -142,6 +143,13 @@ module "iam" {
   server_service_account_name      = var.server_service_account_name
   drain_service_account_name       = var.drain_service_account_name
   vcs_gateway_service_account_name = var.vcs_gateway_service_account_name
+
+  # Flows
+  flows = local.flows_enabled ? {
+    bucket_name          = module.spacelift.flows_bucket_name
+    kms_key_arn          = module.spacelift.flows_kms_key_arn
+    service_account_name = var.flows.service_account_name
+  } : null
 }
 
 module "kube_outputs" {
@@ -224,4 +232,23 @@ module "kube_outputs" {
   # VCS Gateway
   vcs_gateway_domain  = var.vcs_gateway_domain
   vcs_gateway_acm_arn = var.vcs_gateway_acm_arn
+
+  # Flows
+  flows = local.flows_enabled ? {
+    domain               = var.flows.domain
+    acm_arn              = var.flows.acm_arn
+    expose_gateway       = var.flows.expose_gateway
+    service_account_name = var.flows.service_account_name
+    role_arn             = module.iam.flows_role_arn
+    bucket_name          = module.spacelift.flows_bucket_name
+    ecr_repository_url   = module.spacelift.ecr_flows_backend_repository_url
+    organization_name    = var.flows.organization_name
+    admin_email          = var.flows.admin_email
+    agent_pool_id        = random_uuid.flows_default_agent_pool_id[0].result
+  } : null
+  flows_secrets = local.flows_enabled ? {
+    database_url     = var.flows.database_url != null ? var.flows.database_url : module.spacelift.flows_database_url
+    admin_password   = var.flows.admin_password
+    agent_pool_token = random_password.flows_default_agent_pool_token[0].result
+  } : null
 }

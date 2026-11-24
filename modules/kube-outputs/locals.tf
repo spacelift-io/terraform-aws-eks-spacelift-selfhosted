@@ -10,4 +10,56 @@ locals {
   deadletter_fifo_queue_url = local.use_sqs ? local.queue_source["deadletter_fifo"] : ""
   webhooks_queue_url        = local.use_sqs ? local.queue_source["webhooks"] : ""
   iot_queue_url             = local.use_sqs ? local.queue_source["iot"] : ""
+
+  flows_enabled = var.flows != null
+
+  # Null when the image comes from the Spacelift registry, and then the chart's default applies.
+  # The chart takes the registry and the repository separately, an ECR URL has both.
+  flows_ecr_repository_url = var.spacelift_registry_pull_secret_name == null ? try(var.flows.ecr_repository_url, null) : null
+  flows_image_registry     = local.flows_ecr_repository_url == null ? null : split("/", local.flows_ecr_repository_url)[0]
+  flows_image_repository   = local.flows_ecr_repository_url == null ? null : trimprefix(local.flows_ecr_repository_url, "${local.flows_image_registry}/")
+  flows_config = !local.flows_enabled ? "" : jsonencode({
+    (var.flows.domain) = {
+      redirect_url = "https://${var.flows.domain}"
+      api_url      = "https://${var.flows.domain}"
+    }
+  })
+
+  # Flows reads its settings from a config.yaml in a Secret, not from environment variables.
+  flows_secret = !local.flows_enabled ? "" : join("", ["---\n", yamlencode({
+    apiVersion = "v1"
+    kind       = "Secret"
+    metadata = {
+      name      = "spacelift-flows-secret"
+      namespace = var.k8s_namespace
+    }
+    type = "Opaque"
+    stringData = {
+      "config.yaml" = yamlencode({
+        appDomain   = var.flows.domain
+        databaseUrl = var.flows_secrets.database_url
+        objectStorage = {
+          s3 = {
+            bucket = var.flows.bucket_name
+            region = var.aws_region
+          }
+        }
+        defaultAgentPool = {
+          id    = var.flows.agent_pool_id
+          token = var.flows_secrets.agent_pool_token
+        }
+        selfHosted = {
+          organizationName = var.flows.organization_name
+          adminEmail       = var.flows.admin_email
+          adminPassword    = var.flows_secrets.admin_password
+          licenseToken     = var.license_token != null ? var.license_token : ""
+        }
+        server = {
+          publicPort   = 8080
+          internalPort = 8080
+        }
+        spaceliftInstances = jsonencode({ (var.server_domain) = {} })
+      })
+    }
+  })])
 }

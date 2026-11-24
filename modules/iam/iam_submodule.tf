@@ -1,6 +1,6 @@
 module "iam_roles_and_policies" {
   source  = "spacelift-io/iam-spacelift-selfhosted/aws"
-  version = "1.12.0"
+  version = "1.13.0"
 
   write_as_files = false
   kubernetes_role_assumption_config = {
@@ -13,6 +13,7 @@ module "iam_roles_and_policies" {
     # the drain), but the pinned module version still requires the field.
     scheduler_service_account_name   = "spacelift-scheduler"
     vcs_gateway_service_account_name = var.vcs_gateway_service_account_name
+    flows_service_account_name       = try(var.flows.service_account_name, "")
   }
 
   aws_partition = var.aws_partition
@@ -32,6 +33,9 @@ module "iam_roles_and_policies" {
   uploads_bucket_name                  = var.uploads_bucket_name
   user_uploaded_workspaces_bucket_name = var.user_uploaded_workspaces_bucket_name
   workspace_bucket_name                = var.workspace_bucket_name
+
+  flows_bucket_name = try(var.flows.bucket_name, null)
+  flows_kms_key_arn = try(var.flows.kms_key_arn, null)
 
   rds_iam_auth_config = var.rds_iam_auth == null ? null : {
     aws_account_id      = var.aws_account_id
