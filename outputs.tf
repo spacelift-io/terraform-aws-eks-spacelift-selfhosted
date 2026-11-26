@@ -22,6 +22,11 @@ output "shell" {
         BACKEND_IMAGE         = module.spacelift.ecr_backend_repository_url
         LAUNCHER_IMAGE        = module.spacelift.ecr_launcher_repository_url
       } : {},
+      var.create_container_registry && local.flows_enabled ? {
+        FLOWS_BACKEND_IMAGE         = module.spacelift.ecr_flows_backend_repository_url
+        FLOWS_AGENT_IMAGE           = module.spacelift.ecr_flows_agent_repository_url
+        FLOWS_K8S_JS_EXECUTOR_IMAGE = module.spacelift.ecr_flows_k8s_js_executor_repository_url
+      } : {},
     ),
   })
 }
@@ -368,4 +373,50 @@ output "ebs_kms_key_id" {
 output "ebs_encrypted_volumes_patch" {
   value       = var.ebs_encryption.enabled ? "kubectl patch nodeclass default --type=merge -p '{\"spec\":{\"ephemeralStorage\":{\"kmsKeyID\":\"${local.ebs_kms_key_arn}\"}}}'" : "echo \"account_enforces_ebs_encryption is not enabled\""
   description = "kubectl command to patch the default NodeClass with the EBS KMS key. Execute with: $(tofu output -raw ebs_encrypted_volumes_patch)"
+}
+
+output "flows_role_arn" {
+  description = "ARN of the IAM role used by Spacelift Flows. Null when Flows is not deployed."
+  value       = module.iam.flows_role_arn
+}
+
+output "flows_bucket_name" {
+  description = "Name of the Spacelift Flows bucket. Null when Flows is not deployed."
+  value       = module.spacelift.flows_bucket_name
+}
+
+output "flows_bucket_arn" {
+  description = "ARN of the Spacelift Flows bucket. Null when Flows is not deployed."
+  value       = module.spacelift.flows_bucket_arn
+}
+
+output "flows_kms_key_arn" {
+  description = "ARN of the KMS key the Spacelift Flows bucket is encrypted with. Null when Flows is not deployed."
+  value       = module.spacelift.flows_kms_key_arn
+}
+
+output "ecr_flows_backend_repository_url" {
+  value       = module.spacelift.ecr_flows_backend_repository_url
+  description = "URL of the ECR repository for the Flows backend images. Null when Flows is not deployed or create_container_registry is false."
+}
+
+output "ecr_flows_agent_repository_url" {
+  value       = module.spacelift.ecr_flows_agent_repository_url
+  description = "URL of the ECR repository for the Flows agent images. Null when Flows is not deployed or create_container_registry is false."
+}
+
+output "ecr_flows_k8s_js_executor_repository_url" {
+  value       = module.spacelift.ecr_flows_k8s_js_executor_repository_url
+  description = "URL of the ECR repository for the Flows Kubernetes JS executor images. Null when Flows is not deployed or create_container_registry is false."
+}
+
+output "flows_agent_pool_id" {
+  description = "ID of the default Flows agent pool, for configuring the Flows agents. Null when Flows is not deployed."
+  value       = one(random_uuid.flows_default_agent_pool_id[*].result)
+}
+
+output "flows_agent_pool_token" {
+  description = "Token of the default Flows agent pool, for configuring the Flows agents. Null when Flows is not deployed."
+  value       = one(random_password.flows_default_agent_pool_token[*].result)
+  sensitive   = true
 }

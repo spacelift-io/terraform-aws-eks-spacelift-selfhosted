@@ -169,6 +169,12 @@ The module is published as `spacelift-io/eks-spacelift-selfhosted/aws` on both t
 
 ## Examples
 
+### Deploy Spacelift Flows
+
+To deploy [Spacelift Flows](https://docs.spacelift.io/flows/introduction) next to Spacelift, set the `flows` variable. Your license has to include Flows, and Flows needs an ACM certificate of its own.
+
+The [examples/with-flows](examples/with-flows) directory has the prerequisites, a full example and the rest of the details.
+
 ### External workers
 
 ```hcl
@@ -217,7 +223,7 @@ module "spacelift" {
 With `create_container_registry = false`:
 
 - the module creates no ECR repositories, and the `ecr_*` outputs are null;
-- the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE` or `LAUNCHER_IMAGE`;
+- the `shell` output has no `PRIVATE_ECR_LOGIN_URL`, `BACKEND_IMAGE`, `LAUNCHER_IMAGE` or `FLOWS_*_IMAGE`;
 - the `kubernetes_secrets` output has no `LAUNCHER_IMAGE` or `LAUNCHER_IMAGE_TAG`;
 - the `helm_values` output has no `shared.image` from ECR.
 

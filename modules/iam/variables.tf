@@ -144,3 +144,13 @@ variable "rds_iam_auth" {
     error_message = "rds_iam_auth needs a region, a cluster_resource_id and at least one entry in db_usernames. When create_database is false there is no cluster to read the ID from, so set rds_iam_auth.cluster_resource_id explicitly."
   }
 }
+
+variable "flows" {
+  type = object({
+    bucket_name          = string
+    kms_key_arn          = string
+    service_account_name = string
+  })
+  description = "What the Spacelift Flows role needs. Null when Flows is not deployed, and then no role is created."
+  default     = null
+}

@@ -56,6 +56,31 @@ vcsGateway:
       alb.ingress.kubernetes.io/success-codes: "0"
 %{ endif ~}
 
+%{ if FLOWS_ENABLED ~}
+flows:
+  enabled: true
+  domain: "${FLOWS_DOMAIN}"
+%{ if FLOWS_IMAGE_REGISTRY != null ~}
+  image:
+    registry: "${FLOWS_IMAGE_REGISTRY}"
+    repository: "${FLOWS_IMAGE_REPOSITORY}"
+%{ if SPACELIFT_VERSION != "" ~}
+    tag: "${SPACELIFT_VERSION}"
+%{ endif ~}
+%{ endif ~}
+  serviceAccount:
+    name: "${FLOWS_SERVICE_ACCOUNT_NAME}"
+    annotations:
+      eks.amazonaws.com/role-arn: "${FLOWS_ROLE_ARN}"
+  ingress:
+    ingressClassName: "spacelift-flows"
+    exposeGateway: ${FLOWS_EXPOSE_GATEWAY}
+    annotations:
+      alb.ingress.kubernetes.io/healthcheck-port: "8080"
+      alb.ingress.kubernetes.io/healthcheck-path: "/health"
+      alb.ingress.kubernetes.io/load-balancer-attributes: "idle_timeout.timeout_seconds=3600"
+%{ endif ~}
+
 ingress:
   enabled: true
   # We use the spacelift ingress class to automatically create an ALB and use the correct TLS
