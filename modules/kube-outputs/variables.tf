@@ -318,6 +318,7 @@ variable "flows" {
     agent_pool_id        = string
   })
   description = "Spacelift Flows settings. Null when Flows is not deployed, and then the outputs contain nothing about Flows."
+  default     = null
 }
 
 variable "flows_secrets" {
@@ -325,7 +326,9 @@ variable "flows_secrets" {
     database_url     = string
     admin_password   = string
     agent_pool_token = string
+    extra_config     = any
   })
   description = "The sensitive part of the Spacelift Flows settings. Null when Flows is not deployed."
   sensitive   = true
+  default     = null
 }

@@ -861,9 +861,10 @@ variable "flows" {
     database_url         = optional(string)
     expose_gateway       = optional(bool, false)
     service_account_name = optional(string, "spacelift-flows")
+    extra_config         = optional(any)
   })
   description = <<-EOT
-    Deploys Spacelift Flows next to Spacelift. Leave null to not deploy it.
+    Deploys Spacelift Flows next to Spacelift. Leave null to not deploy it. Needs `license_token` to be set as well.
 
     When set, the module creates the Flows bucket, its KMS key and the IAM role, and adds Flows to the `kubernetes_secrets`,
     `kubernetes_ingress_class` and `helm_values` outputs.
@@ -878,6 +879,10 @@ variable "flows" {
     - `database_url`: the connection string of the Flows database. Set it when `create_database` is false.
     - `expose_gateway`: whether to route `gateway.<domain>` to the Flows gateway, for agents that run outside the cluster.
     - `service_account_name`: the name of the Kubernetes service account used by Flows. Defaults to spacelift-flows.
+    - `extra_config`: extra settings for the Flows config file, in the structure of that file (e.g.,
+      `{ email = { smtp = { host = "smtp.example.com", ... } } }`). Flows reads nothing from environment variables
+      once it has a config file, so this is the place for anything the module doesn't set. A section the module
+      writes too, like `server`, is merged with yours, and your values win.
   EOT
   default     = null
 

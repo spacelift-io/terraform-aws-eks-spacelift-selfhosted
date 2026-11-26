@@ -4,6 +4,7 @@ module "spacelift_eks_selfhosted" {
   aws_region         = "us-east-1"
   server_domain      = "deploy.spacelift.io"
   rds_engine_version = "18.6"
+  license_token      = "<your-license-token>"
 
   flows = {
     domain            = "flows.spacelift.io"

@@ -250,5 +250,6 @@ module "kube_outputs" {
     database_url     = var.flows.database_url != null ? var.flows.database_url : module.spacelift.flows_database_url
     admin_password   = var.flows.admin_password
     agent_pool_token = random_password.flows_default_agent_pool_token[0].result
+    extra_config     = var.flows.extra_config
   } : null
 }

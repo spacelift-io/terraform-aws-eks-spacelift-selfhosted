@@ -78,6 +78,7 @@ flows:
     annotations:
       alb.ingress.kubernetes.io/healthcheck-port: "8080"
       alb.ingress.kubernetes.io/healthcheck-path: "/health"
+      alb.ingress.kubernetes.io/load-balancer-attributes: "idle_timeout.timeout_seconds=3600"
 %{ endif ~}
 
 ingress:

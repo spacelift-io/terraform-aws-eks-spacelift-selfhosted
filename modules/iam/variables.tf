@@ -152,4 +152,5 @@ variable "flows" {
     service_account_name = string
   })
   description = "What the Spacelift Flows role needs. Null when Flows is not deployed, and then no role is created."
+  default     = null
 }
