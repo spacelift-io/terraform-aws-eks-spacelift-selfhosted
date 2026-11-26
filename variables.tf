@@ -874,12 +874,19 @@ variable "flows" {
     - `organization_name`: the name of the organization Flows creates on its first start. It's a display name
       (e.g., "My Corp"), and shows up in places like invitation emails.
     - `admin_email`: the email of the admin user Flows creates on its first start.
-    - `admin_password`: the password that admin user logs in with.
+    - `admin_password`: the password that admin user logs in with, at least 32 characters long.
     - `database_url`: the connection string of the Flows database. Set it when `create_database` is false.
     - `expose_gateway`: whether to route `gateway.<domain>` to the Flows gateway, for agents that run outside the cluster.
     - `service_account_name`: the name of the Kubernetes service account used by Flows. Defaults to spacelift-flows.
   EOT
   default     = null
+
+  # A conditional instead of ||, because || only short-circuits from Terraform 1.12,
+  # and before that the right side fails on a null flows.
+  validation {
+    condition     = var.flows == null ? true : length(var.flows.admin_password) >= 32
+    error_message = "flows.admin_password has to be at least 32 characters long."
+  }
 }
 
 variable "rds_iam_auth" {
